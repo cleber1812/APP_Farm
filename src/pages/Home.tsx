@@ -57,6 +57,7 @@ export function Home () {
       setCalculatedPlants(Math.floor(area / (rowSpacing * plantSpacing)));
       setPlants(calculatedPlants)
     }
+    
 
     // Cycle start dates calculations
     const secondStart = firstCycleStart + firstCycleDuration + 60;
