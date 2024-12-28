@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,7 +57,7 @@ export function Home () {
       setCalculatedPlants(Math.floor(area / (rowSpacing * plantSpacing)));
       setPlants(calculatedPlants)
     }
-    
+
 
     // Cycle start dates calculations
     const secondStart = firstCycleStart + firstCycleDuration + 60;
