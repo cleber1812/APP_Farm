@@ -38,6 +38,14 @@ export function Home () {
   const [perPlantProductivity, setPerPlantProductivity] = useState(0);
   const [totalProductivity, setTotalProductivity] = useState(0);
 
+  // Mudas states
+  const [reservePercentage, setReservePercentage] = useState(10);
+  const [seedlingUnitPrice, setSeedlingUnitPrice] = useState(0.20);
+
+  // Calculated Mudas values
+  const [totalSeedlings, setTotalSeedlings] = useState(0);
+  const [totalSeedlingsCost, setTotalSeedlingsCost] = useState(0);
+
   // Irrigation states
   const [irrigationHours, setIrrigationHours] = useState(1);
   const [holesPerMeter, setHolesPerMeter] = useState(5);
@@ -101,6 +109,16 @@ export function Home () {
     const totalProd = plants * perPlantProd;
     setTotalProductivity(totalProd);
 
+    // SECAO MUDAS
+    // Calcula o total de mudas (quantidade + reserva)
+    const reserveAmount = Math.ceil(plants * (reservePercentage / 100));
+    const totalSeedlingsCalc = plants + reserveAmount;
+    setTotalSeedlings(totalSeedlingsCalc);
+
+    // Calcula o custo total das mudas
+    const totalCost = totalSeedlingsCalc * seedlingUnitPrice;
+    setTotalSeedlingsCost(totalCost);
+
     // SECAO IRRIGAÇÃO
     // Calculate dripping hose length
     const hoseLength = calculatedArea / rowSpacing;
@@ -134,6 +152,7 @@ export function Home () {
   }, [plants, area, rowSpacing, plantSpacing, calculationType,
     firstCycleProduction, secondCycleProduction, thirdCycleProduction,
     firstCycleStart, firstCycleDuration, secondCycleDuration, thirdCycleDuration,
+    reservePercentage, seedlingUnitPrice,
     totalCycleDays, calculatedArea,
     irrigationHours, holeFlow, holesPerMeter, waterCost, pumpConsumption, energyCost,
     wholesalePrice, retailPrice, wholesalePercentage,
@@ -370,8 +389,67 @@ export function Home () {
 
       <Card className="w-full max-w-2xl">
         <CardHeader>
+          <CardTitle>Mudas</CardTitle>
+          <div className="text-lg font-medium">Categoria: Material de Consumo</div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            {/* <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Item</TableHead>
+                <TableHead className="text-center">Valor</TableHead>
+              </TableRow>
+            </TableHeader> */}
+            <TableBody>
+              <TableRow>
+                <TableCell>Quantidade (mudas)</TableCell>
+                <TableCell>{plants.toLocaleString('pt-BR')}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Reserva (%)</TableCell>
+                <TableCell className="space-y-2">                  
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={reservePercentage}
+                    onChange={(e) => setReservePercentage(Number(e.target.value))}
+                  />
+                </TableCell>
+                {/* <TableCell>{Math.ceil(plants * (reservePercentage / 100)).toLocaleString('pt-BR')}</TableCell> */}
+              </TableRow>
+              <TableRow>
+                <TableCell>Total de mudas (quant)</TableCell>
+                <TableCell>{totalSeedlings.toLocaleString('pt-BR')}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Valor unitário (R$)</TableCell>
+                <TableCell className="space-y-2">                  
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={seedlingUnitPrice}
+                    onChange={(e) => setSeedlingUnitPrice(Number(e.target.value))}
+                  />
+                </TableCell>
+                {/* <TableCell>R$ {seedlingUnitPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell> */}
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total de mudas (R$)</TableCell>
+                <TableCell>R$ {totalSeedlingsCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
           <CardTitle>Irrigação</CardTitle>
-          <div className="text-lg font-medium">Serviços</div>
+          <div className="text-lg font-medium">Categoria: Serviços</div>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
