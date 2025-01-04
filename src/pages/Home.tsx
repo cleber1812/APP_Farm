@@ -6,6 +6,16 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+// Interface para novos estados de FERTILIZANTES
+interface Fertilizer {
+  name: string;
+  quantityPerPlant: number;
+  frequency: number;
+  totalQuantity: number;
+  pricePerKg: number;
+  totalCost: number;
+}
+
 export function Home () {
   // Plantel states
   const [calculationType, setCalculationType] = useState("byPlants");
@@ -60,6 +70,37 @@ export function Home () {
   const [totalWaterCost, setTotalWaterCost] = useState(0);
   const [energyQuantity, setEnergyQuantity] = useState(0);
   const [totalEnergyCost, setTotalEnergyCost] = useState(0);
+
+  // Fertilizantes states
+  const [fertilizers, setFertilizers] = useState<Fertilizer[]>([
+    {
+      name: "Uréia (N 45%)",
+      quantityPerPlant: 6,
+      frequency: 3,
+      totalQuantity: 0,
+      pricePerKg: 3.99,
+      totalCost: 0
+    },
+    {
+      name: "Fosfato SuperSimples (H2PO4)",
+      quantityPerPlant: 40,
+      frequency: 3,
+      totalQuantity: 0,
+      pricePerKg: 2.99,
+      totalCost: 0
+    },
+    {
+      name: "Cloreto de Potássio (KCl 60%)",
+      quantityPerPlant: 4,
+      frequency: 3,
+      totalQuantity: 0,
+      pricePerKg: 4.99,
+      totalCost: 0
+    }
+  ]);
+  
+  // Calculated Fertilization values
+  const [totalFertilizerCost, setTotalFertilizerCost] = useState(0);
 
   // Vendas states
   const [wholesalePrice, setWholesalePrice] = useState(7.00);
@@ -157,6 +198,32 @@ export function Home () {
     irrigationHours, holeFlow, holesPerMeter, waterCost, pumpConsumption, energyCost,
     wholesalePrice, retailPrice, wholesalePercentage,
   ]);
+
+  // useEffect para os cálculos da seção de adubação
+  useEffect(() => {
+    const updatedFertilizers = fertilizers.map(fert => {
+      const totalQuantity = (plants * fert.quantityPerPlant * fert.frequency) / 1000;
+      const totalCost = totalQuantity * fert.pricePerKg;
+      return {
+        ...fert,
+        totalQuantity,
+        totalCost
+      };
+    });
+
+    setFertilizers(updatedFertilizers);
+    setTotalFertilizerCost(updatedFertilizers.reduce((sum, fert) => sum + fert.totalCost, 0));
+  }, [plants, fertilizers]);
+
+  // Função auxiliar para atualizar um fertilizante específico
+  const updateFertilizer = (index: number, field: keyof Fertilizer, value: string | number) => {
+    const newFertilizers = [...fertilizers];
+    newFertilizers[index] = {
+      ...newFertilizers[index],
+      [field]: value
+    };
+    setFertilizers(newFertilizers);
+  };
 
   return (
     <div className="space-y-6">
@@ -571,6 +638,79 @@ export function Home () {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Adubação (de Plantio)</CardTitle>
+          <div className="text-lg font-medium">Categoria: Material de Consumo</div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">Fertilizante</TableHead>
+                <TableHead className="text-center">Quant/planta (g)</TableHead>
+                <TableHead className="text-center">Frequência</TableHead>
+                <TableHead className="text-center">Quantidade total (Kg)</TableHead>
+                <TableHead className="text-center">Preço/KG (R$)</TableHead>
+                <TableHead className="text-center">Custo fertilizante (R$)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {fertilizers.map((fertilizer, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Input
+                      value={fertilizer.name}
+                      onChange={(e) => updateFertilizer(index, 'name', e.target.value)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={fertilizer.quantityPerPlant}
+                      onChange={(e) => updateFertilizer(index, 'quantityPerPlant', Number(e.target.value))}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={fertilizer.frequency}
+                      onChange={(e) => updateFertilizer(index, 'frequency', Number(e.target.value))}
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {fertilizer.totalQuantity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={fertilizer.pricePerKg}
+                      onChange={(e) => updateFertilizer(index, 'pricePerKg', Number(e.target.value))}
+                    />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    R$ {fertilizer.totalCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </TableCell>
+                </TableRow>
+              ))}
+              <TableRow className="font-medium">
+                <TableCell colSpan={5} className="text-right">Total de Fertilizantes</TableCell>
+                <TableCell className="text-center">
+                  R$ {totalFertilizerCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
