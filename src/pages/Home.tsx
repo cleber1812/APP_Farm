@@ -75,26 +75,26 @@ export function Home () {
   const [fertilizers, setFertilizers] = useState<Fertilizer[]>([
     {
       name: "Uréia (N 45%)",
-      quantityPerPlant: 6,
-      frequency: 3,
+      quantityPerPlant: 5,
+      frequency: 1,
+      totalQuantity: 0,
+      pricePerKg: 3.49,
+      totalCost: 0
+    },
+    {
+      name: "Fosfato SuperSimples (H2PO4)",
+      quantityPerPlant: 45,
+      frequency: 1,
       totalQuantity: 0,
       pricePerKg: 3.99,
       totalCost: 0
     },
     {
-      name: "Fosfato SuperSimples (H2PO4)",
-      quantityPerPlant: 40,
-      frequency: 3,
-      totalQuantity: 0,
-      pricePerKg: 2.99,
-      totalCost: 0
-    },
-    {
       name: "Cloreto de Potássio (KCl 60%)",
-      quantityPerPlant: 4,
-      frequency: 3,
+      quantityPerPlant: 5,
+      frequency: 1,
       totalQuantity: 0,
-      pricePerKg: 4.99,
+      pricePerKg: 6.49,
       totalCost: 0
     }
   ]);
