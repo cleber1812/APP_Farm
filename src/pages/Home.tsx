@@ -70,6 +70,11 @@ export function Home () {
   const [totalWaterCost, setTotalWaterCost] = useState(0);
   const [energyQuantity, setEnergyQuantity] = useState(0);
   const [totalEnergyCost, setTotalEnergyCost] = useState(0);
+  const [totalIrrigationCost, setTotalIrrigationCost] = useState(0);
+
+  // Análise de Solo states
+  const [soilAnalysisProvider, setSoilAnalysisProvider] = useState("Epamig");
+  const [soilAnalysisCost, setSoilAnalysisCost] = useState(120.99);
 
   // Fertilizantes states
   const [fertilizers, setFertilizers] = useState<Fertilizer[]>([
@@ -181,6 +186,10 @@ export function Home () {
     const energyTotalCost = energyQty * energyCost;
     setTotalEnergyCost(energyTotalCost);
 
+    // Calculate total Irrigation cost
+    const irrigationTotalCost = waterTotalCost + energyTotalCost;
+    setTotalIrrigationCost(irrigationTotalCost);
+
     
     // SECAO VENDAS
     // Calculate per plant revenue and total revenue
@@ -196,6 +205,7 @@ export function Home () {
     reservePercentage, seedlingUnitPrice,
     totalCycleDays, calculatedArea,
     irrigationHours, holeFlow, holesPerMeter, waterCost, pumpConsumption, energyCost,
+    soilAnalysisCost,
     wholesalePrice, retailPrice, wholesalePercentage,
   ]);
 
@@ -223,6 +233,19 @@ export function Home () {
       [field]: value
     };
     setFertilizers(newFertilizers);
+  };
+
+  // Funções auxiliares para card Resultado
+  const calculatePercentage = (value: number, total: number) => {
+    return total ? (value / total * 100) : 0;
+  };
+
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const formatPercentage = (value: number) => {
+    return value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   };
 
   return (
@@ -637,7 +660,46 @@ export function Home () {
                 </p>
               </div>
             </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-lg font-medium">
+              <div> Total de Irrigação (R$) </div>
+              <div>
+                R$ {totalIrrigationCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Análise de solo</CardTitle>
+          <div className="text-lg font-medium">Categoria: Serviços</div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <Label>Fornecedor</Label>
+                  <Input
+                    value={soilAnalysisProvider}
+                    onChange={(e) => setSoilAnalysisProvider(e.target.value)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Label>Valor (R$)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={soilAnalysisCost}
+                    onChange={(e) => setSoilAnalysisCost(Number(e.target.value))}
+                  />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
 
@@ -760,6 +822,109 @@ export function Home () {
                 <TableCell colSpan={3}>Receita</TableCell>
                 <TableCell>R$ {perKgRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / kg</TableCell>
                 <TableCell>R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      
+      <Card className="w-full max-w-2xl bg-slate-50 border-2 border-slate-200">
+        <CardHeader className="bg-slate-100">
+          <CardTitle>Resultado</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableBody>
+              {/* Receita */}
+              <TableRow className="font-medium">
+                <TableCell>Receita de vendas</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(totalRevenue)}</TableCell>
+                <TableCell className="text-right">100%</TableCell>
+              </TableRow>
+
+              {/* Material de Consumo */}
+              <TableRow className="bg-slate-100">
+                <TableCell colSpan={3} className="font-medium">Material de Consumo</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Mudas</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(totalSeedlingsCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost, totalRevenue))}%</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Adubação (de Plantio)</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(totalFertilizerCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalFertilizerCost, totalRevenue))}%</TableCell>
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total Material de Consumo</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(totalSeedlingsCost + totalFertilizerCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost + totalFertilizerCost, totalRevenue))}%</TableCell>
+              </TableRow>
+
+              {/* Serviços */}
+              <TableRow className="bg-slate-100">
+                <TableCell colSpan={3} className="font-medium">Serviços</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Irrigação</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(totalIrrigationCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalWaterCost + totalEnergyCost, totalRevenue))}%</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Análise de solo</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(soilAnalysisCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(soilAnalysisCost, totalRevenue))}%</TableCell>
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total Serviços</TableCell>
+                <TableCell className="text-right">R$ {formatCurrency(totalIrrigationCost + soilAnalysisCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalIrrigationCost + soilAnalysisCost, totalRevenue))}%</TableCell>
+              </TableRow>
+
+              {/* Investimentos */}
+              <TableRow className="bg-slate-100">
+                <TableCell colSpan={3} className="font-medium">Investimentos</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Irrigação</TableCell>
+                <TableCell className="text-right">R$ 5.000,00</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(5000, totalRevenue))}%</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Máquinas</TableCell>
+                <TableCell className="text-right">R$ 2.000,00</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(2000, totalRevenue))}%</TableCell>
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total Investimentos</TableCell>
+                <TableCell className="text-right">R$ 7.000,00</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(7000, totalRevenue))}%</TableCell>
+              </TableRow>
+
+              {/* Lucro Líquido */}
+              <TableRow className="font-medium text-lg border-t-2">
+                <TableCell>Lucro Líquido</TableCell>
+                <TableCell className="text-right">
+                  R$ {formatCurrency(
+                    totalRevenue - 
+                    (totalSeedlingsCost + totalFertilizerCost) - 
+                    (totalIrrigationCost + soilAnalysisCost) - 
+                    7000
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatPercentage(
+                    calculatePercentage(
+                      totalRevenue - 
+                      (totalSeedlingsCost + totalFertilizerCost) - 
+                      (totalIrrigationCost + soilAnalysisCost) - 
+                      7000,
+                      totalRevenue
+                    )
+                  )}%
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
