@@ -5,6 +5,8 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info, DollarSign, Wallet } from "lucide-react";
 
 // Interface para novos estados de FERTILIZANTES
 interface Fertilizer {
@@ -115,6 +117,10 @@ export function Home () {
   // Calculated Vendas values
   const [perKgRevenue, setPerKgRevenue] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
+
+  // Investimentos values
+  const [irrigationInvestCost, setIrrigationInvestCost] = useState(4900.99);
+  const [machineInvestCost , setMachineInvestCost] = useState(1800.95);
 
   useEffect(() => {
     // Área calculations
@@ -241,12 +247,36 @@ export function Home () {
   };
 
   const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
   const formatPercentage = (value: number) => {
-    return value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
   };
+
+  // Seção RESULTADOS e DASHBOARD
+  // // Calcular custos totais
+  const consumptionCosts = totalSeedlingsCost + totalFertilizerCost;
+  const serviceCosts = totalIrrigationCost + soilAnalysisCost;
+  // const manCosts = 5000;
+  const totalCosts = consumptionCosts + serviceCosts;
+  
+  const totalInvestiments = irrigationInvestCost + machineInvestCost;
+
+  // Calcular lucro líquido
+  const netRevenue = totalRevenue - totalCosts;
+  
+  // Calcular lucratividade
+  const profitability = calculatePercentage(netRevenue , totalRevenue);  
+  
+  // Calcular relação benefício/custo
+  const costBenefitRatio = totalRevenue / totalCosts;
+  
+  // Calcular custo médio
+  const averageCost = totalCosts / totalProductivity;
+  
+  // Calcular percentual de custo sobre faturamento
+  const costPercentage = calculatePercentage(totalCosts , totalRevenue);
 
   return (
     <div className="space-y-6">
@@ -818,10 +848,49 @@ export function Home () {
           </div>
           <Table>
             <TableBody>
+              <TableRow className="font-medium">                
+                <TableCell>Preço Médio: R$ {perKgRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / kg</TableCell>
+                <TableCell>Receita Total: R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Investimentos</CardTitle>
+          {/* <div className="text-lg font-medium">Categoria: Serviços</div> */}
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <Label>Irrigação (R$)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={irrigationInvestCost}
+                    onChange={(e) => setIrrigationInvestCost(Number(e.target.value))}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Label>Máquinas (R$)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={machineInvestCost}
+                    onChange={(e) => setMachineInvestCost(Number(e.target.value))}
+                  />
+                </TableCell>
+              </TableRow>
               <TableRow className="font-medium">
-                <TableCell colSpan={3}>Receita</TableCell>
-                <TableCell>R$ {perKgRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / kg</TableCell>
-                <TableCell>R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total</TableCell>
+                <TableCell>Total Investimentos</TableCell>
+                <TableCell className="text-right">{formatCurrency(totalInvestiments)}</TableCell>                
               </TableRow>
             </TableBody>
           </Table>
@@ -831,17 +900,17 @@ export function Home () {
       
       <Card className="w-full max-w-2xl bg-slate-50 border-2 border-slate-200">
         <CardHeader className="bg-slate-100">
-          <CardTitle>Resultado</CardTitle>
+          <CardTitle>Resumo dos custos</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableBody>
               {/* Receita */}
-              <TableRow className="font-medium">
+              {/* <TableRow className="font-medium">
                 <TableCell>Receita de vendas</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(totalRevenue)}</TableCell>
+                <TableCell className="text-right">{formatCurrency(totalRevenue)}</TableCell>
                 <TableCell className="text-right">100%</TableCell>
-              </TableRow>
+              </TableRow> */}
 
               {/* Material de Consumo */}
               <TableRow className="bg-slate-100">
@@ -849,18 +918,18 @@ export function Home () {
               </TableRow>
               <TableRow>
                 <TableCell className="pl-8">Mudas</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(totalSeedlingsCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost, totalRevenue))}%</TableCell>
+                <TableCell className="text-right">{formatCurrency(totalSeedlingsCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="pl-8">Adubação (de Plantio)</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(totalFertilizerCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalFertilizerCost, totalRevenue))}%</TableCell>
+                <TableCell className="text-right">{formatCurrency(totalFertilizerCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalFertilizerCost, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow className="font-medium">
                 <TableCell>Total Material de Consumo</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(totalSeedlingsCost + totalFertilizerCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost + totalFertilizerCost, totalRevenue))}%</TableCell>
+                <TableCell className="text-right">{formatCurrency(consumptionCosts)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(consumptionCosts, totalRevenue))}</TableCell>
               </TableRow>
 
               {/* Serviços */}
@@ -869,67 +938,169 @@ export function Home () {
               </TableRow>
               <TableRow>
                 <TableCell className="pl-8">Irrigação</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(totalIrrigationCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalWaterCost + totalEnergyCost, totalRevenue))}%</TableCell>
+                <TableCell className="text-right">{formatCurrency(totalIrrigationCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalIrrigationCost, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="pl-8">Análise de solo</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(soilAnalysisCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(soilAnalysisCost, totalRevenue))}%</TableCell>
+                <TableCell className="text-right">{formatCurrency(soilAnalysisCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(soilAnalysisCost, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow className="font-medium">
                 <TableCell>Total Serviços</TableCell>
-                <TableCell className="text-right">R$ {formatCurrency(totalIrrigationCost + soilAnalysisCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalIrrigationCost + soilAnalysisCost, totalRevenue))}%</TableCell>
-              </TableRow>
-
-              {/* Investimentos */}
-              <TableRow className="bg-slate-100">
-                <TableCell colSpan={3} className="font-medium">Investimentos</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="pl-8">Irrigação</TableCell>
-                <TableCell className="text-right">R$ 5.000,00</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(5000, totalRevenue))}%</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="pl-8">Máquinas</TableCell>
-                <TableCell className="text-right">R$ 2.000,00</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(2000, totalRevenue))}%</TableCell>
-              </TableRow>
-              <TableRow className="font-medium">
-                <TableCell>Total Investimentos</TableCell>
-                <TableCell className="text-right">R$ 7.000,00</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(7000, totalRevenue))}%</TableCell>
-              </TableRow>
+                <TableCell className="text-right">{formatCurrency(serviceCosts)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(serviceCosts, totalRevenue))}</TableCell>
+              </TableRow>              
 
               {/* Lucro Líquido */}
-              <TableRow className="font-medium text-lg border-t-2">
+              {/* <TableRow className="font-medium text-lg border-t-2">
                 <TableCell>Lucro Líquido</TableCell>
                 <TableCell className="text-right">
-                  R$ {formatCurrency(
-                    totalRevenue - 
-                    (totalSeedlingsCost + totalFertilizerCost) - 
-                    (totalIrrigationCost + soilAnalysisCost) - 
-                    7000
-                  )}
+                  {formatCurrency(netRevenue)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {formatPercentage(
-                    calculatePercentage(
-                      totalRevenue - 
-                      (totalSeedlingsCost + totalFertilizerCost) - 
-                      (totalIrrigationCost + soilAnalysisCost) - 
-                      7000,
-                      totalRevenue
-                    )
-                  )}%
+                  {formatPercentage(profitability)}
                 </TableCell>
-              </TableRow>
+              </TableRow> */}
+            
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+
+      <div className="w-full max-w-2xl grid gap-6 md:grid-cols-2">
+      {/* Card de Receita */}
+      <Card className="p-6 space-y-6">
+          {/* <h3 className="text-xl font-semibold">Receita</h3> */}
+        <div className="flex items-center justify-between">
+          {/* Indicador Principal */}
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Receita de vendas</p>
+          <p className="text-3xl font-bold text-green-600">
+            {formatCurrency(totalRevenue)}
+          </p>
+        </div>
+          <DollarSign className="h-14 w-14 text-green-500" />
+        </div>                  
+
+        {/* Indicadores Secundários */}
+        <div className="grid gap-4 pt-4 border-t">
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Receita Líquida</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Valor descontado todos os custos</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-lg font-semibold">{formatCurrency(netRevenue)}</p>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Lucratividade</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Percentual do lucro sobre o faturamento</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-lg font-semibold">{formatPercentage(profitability)}</p>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Relação benefício custo</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Vendas para cada um real de custo</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-lg font-semibold">{costBenefitRatio.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Card de Despesa */}
+      <Card className="p-6 space-y-6">
+          {/* <h3 className="text-xl font-semibold">Despesa</h3> */}
+        <div className="flex items-center justify-between">
+          {/* Indicador Principal */}
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Custo total</p>
+          <p className="text-3xl font-bold text-red-600">
+            {formatCurrency(totalCosts)}
+          </p>
+        </div>
+          <Wallet className="h-16 w-14 text-red-500" />
+        </div>        
+
+        {/* Indicadores Secundários */}
+        <div className="grid gap-4 pt-4 border-t">
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Custo total médio (CTMe)</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Custo médio por Kg</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-lg font-semibold">{formatCurrency(averageCost)} /kg</p>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">CT (%)</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Percentual do custo sobre o faturamento</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-lg font-semibold">{formatPercentage(costPercentage)}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+      </div>     
 
 
     </div>
