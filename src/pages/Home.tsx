@@ -7,6 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info, DollarSign, Wallet } from "lucide-react";
+import LaborSection from '../components/LaborSection';  // ajuste o caminho conforme necessário
 
 // Interface para novos estados de FERTILIZANTES
 interface Fertilizer {
@@ -258,8 +259,13 @@ export function Home () {
   // // Calcular custos totais
   const consumptionCosts = totalSeedlingsCost + totalFertilizerCost;
   const serviceCosts = totalIrrigationCost + soilAnalysisCost;
-  // const manCosts = 5000;
-  const totalCosts = consumptionCosts + serviceCosts;
+  // const laborCosts = 5000;
+  const [laborCosts, setLaborCosts] = useState(0);
+  const handleLaborCostChange = (cost: number) => {
+    setLaborCosts(cost);
+  };
+
+  const totalCosts = consumptionCosts + serviceCosts + laborCosts;
   
   const totalInvestiments = irrigationInvestCost + machineInvestCost;
 
@@ -806,6 +812,14 @@ export function Home () {
         </CardContent>
       </Card>
 
+      <LaborSection 
+        plants={plants}
+        area={calculatedArea}
+        totalCycleDays={totalCycleDays}
+        totalProductivity={totalProductivity}
+        onLaborCostChange={handleLaborCostChange}
+      />
+
 
       <Card className="w-full max-w-2xl">
         <CardHeader>
@@ -950,6 +964,16 @@ export function Home () {
                 <TableCell>Total Serviços</TableCell>
                 <TableCell className="text-right">{formatCurrency(serviceCosts)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(serviceCosts, totalRevenue))}</TableCell>
+              </TableRow> 
+
+              {/* Mão de obra */}
+              <TableRow className="bg-slate-100">
+                <TableCell colSpan={3} className="font-medium">Mão de obra</TableCell>
+              </TableRow>              
+              <TableRow className="font-medium">
+                <TableCell>Total Mão de obra</TableCell>
+                <TableCell className="text-right">{formatCurrency(laborCosts)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(laborCosts, totalRevenue))}</TableCell>
               </TableRow>              
 
               {/* Lucro Líquido */}
