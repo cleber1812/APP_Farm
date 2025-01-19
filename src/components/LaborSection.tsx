@@ -10,10 +10,10 @@ interface LaborSectionProps {
     area: number;
     totalCycleDays: number;
     totalProductivity: number;
-    onLaborCostChange: (cost: number) => void;  // nova prop
+    onLaborCostChange: (labor: number) => void;  // nova prop
   }
 
-const LaborSection = ({ plants, area, totalCycleDays, totalProductivity, onLaborCostChange }: LaborSectionProps) => {
+export function LaborSection({ plants, area, totalCycleDays, totalProductivity, onLaborCostChange }: LaborSectionProps) {
 
   // Main labor state
   const [dailyRate, setDailyRate] = useState(80.00);
@@ -105,7 +105,7 @@ const LaborSection = ({ plants, area, totalCycleDays, totalProductivity, onLabor
     <Card className="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Mão de Obra</CardTitle>
-        <div className="text-lg font-medium">Categoria: Serviços</div>
+        <div className="text-lg font-medium">Categoria: Mão de Obra</div>
       </CardHeader>
       <CardContent>
         <Table>
@@ -276,4 +276,3 @@ const LaborSection = ({ plants, area, totalCycleDays, totalProductivity, onLabor
   );
 };
 
-export default LaborSection;

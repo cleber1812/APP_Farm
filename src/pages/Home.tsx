@@ -7,7 +7,8 @@ import { Slider } from '@/components/ui/slider';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info, DollarSign, Wallet } from "lucide-react";
-import LaborSection from '../components/LaborSection';  // ajuste o caminho conforme necessário
+import { LaborSection } from '../components/LaborSection';  // ajuste o caminho conforme necessário
+import { SoilPreparation } from '../components/SoilPreparation';
 
 // Interface para novos estados de FERTILIZANTES
 interface Fertilizer {
@@ -132,7 +133,11 @@ export function Home () {
       setCalculatedArea(plants * rowSpacing * plantSpacing);
     //   setArea(calculatedArea)
     } else {
-      setCalculatedPlants(Math.floor(area / (rowSpacing * plantSpacing)));
+      setCalculatedPlants(
+        (!rowSpacing || !plantSpacing || rowSpacing === 0 || plantSpacing === 0) 
+          ? 1 
+          : Math.floor(area / (rowSpacing * plantSpacing))
+      );
       setPlants(calculatedPlants)
       setCalculatedArea(area)
     }    
@@ -255,15 +260,17 @@ export function Home () {
     return value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
   };
 
+  // Variáveis retornadas dos COMPONENTES //
+  const [laborCosts, setLaborCosts] = useState(0);
+
+  const [soilPreparationCost, setSoilPreparationCost] = useState(0);
+
   // Seção RESULTADOS e DASHBOARD
   // // Calcular custos totais
   const consumptionCosts = totalSeedlingsCost + totalFertilizerCost;
-  const serviceCosts = totalIrrigationCost + soilAnalysisCost;
-  // const laborCosts = 5000;
-  const [laborCosts, setLaborCosts] = useState(0);
-  const handleLaborCostChange = (cost: number) => {
-    setLaborCosts(cost);
-  };
+  const serviceCosts = totalIrrigationCost + soilAnalysisCost + soilPreparationCost;
+  
+
 
   const totalCosts = consumptionCosts + serviceCosts + laborCosts;
   
@@ -389,7 +396,7 @@ export function Home () {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Ciclo</TableHead>
+                <TableHead>Safra</TableHead>
                 <TableHead>Produtividade (kg/planta)</TableHead>
                 <TableHead>Produtividade (kg/total)</TableHead>
                 <TableHead>Início da colheita (dias)</TableHead>
@@ -398,7 +405,7 @@ export function Home () {
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell>1º ciclo</TableCell>
+                <TableCell>1ª safra</TableCell>
                 <TableCell>
                   <Input
                     type="number"
@@ -431,7 +438,7 @@ export function Home () {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>2º ciclo</TableCell>
+                <TableCell>2ª safra</TableCell>
                 <TableCell>
                   <Input
                     type="number"
@@ -465,7 +472,7 @@ export function Home () {
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>3º ciclo</TableCell>
+                <TableCell>3ª safra</TableCell>
                 <TableCell>
                   <Input
                     type="number"
@@ -739,6 +746,12 @@ export function Home () {
         </CardContent>
       </Card>
 
+
+      <SoilPreparation 
+        area={calculatedArea} 
+        onTotalCostChange={(soil) => setSoilPreparationCost(soil)} 
+      />
+
       
       <Card className="w-full max-w-2xl">
         <CardHeader>
@@ -817,7 +830,7 @@ export function Home () {
         area={calculatedArea}
         totalCycleDays={totalCycleDays}
         totalProductivity={totalProductivity}
-        onLaborCostChange={handleLaborCostChange}
+        onLaborCostChange={(labor) => setLaborCosts(labor)}
       />
 
 
@@ -959,6 +972,11 @@ export function Home () {
                 <TableCell className="pl-8">Análise de solo</TableCell>
                 <TableCell className="text-right">{formatCurrency(soilAnalysisCost)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(soilAnalysisCost, totalRevenue))}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Preparação de solo</TableCell>
+                <TableCell className="text-right">{formatCurrency(soilPreparationCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(soilPreparationCost, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow className="font-medium">
                 <TableCell>Total Serviços</TableCell>
