@@ -9,16 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Info, DollarSign, Wallet } from "lucide-react";
 import { LaborSection } from '../components/LaborSection';  // ajuste o caminho conforme necessário
 import { SoilPreparation } from '../components/SoilPreparation';
+import { FertilizerSection } from '../components/FertilizerSection';  // ajuste o caminho conforme necessário
 
-// Interface para novos estados de FERTILIZANTES
-interface Fertilizer {
-  name: string;
-  quantityPerPlant: number;
-  frequency: number;
-  totalQuantity: number;
-  pricePerKg: number;
-  totalCost: number;
-}
 
 export function Home () {
   // Plantel states
@@ -79,37 +71,6 @@ export function Home () {
   // Análise de Solo states
   const [soilAnalysisProvider, setSoilAnalysisProvider] = useState("Epamig");
   const [soilAnalysisCost, setSoilAnalysisCost] = useState(120.99);
-
-  // Fertilizantes states
-  const [fertilizers, setFertilizers] = useState<Fertilizer[]>([
-    {
-      name: "Uréia (N 45%)",
-      quantityPerPlant: 5,
-      frequency: 1,
-      totalQuantity: 0,
-      pricePerKg: 3.49,
-      totalCost: 0
-    },
-    {
-      name: "Fosfato SuperSimples (H2PO4)",
-      quantityPerPlant: 45,
-      frequency: 1,
-      totalQuantity: 0,
-      pricePerKg: 3.99,
-      totalCost: 0
-    },
-    {
-      name: "Cloreto de Potássio (KCl 60%)",
-      quantityPerPlant: 5,
-      frequency: 1,
-      totalQuantity: 0,
-      pricePerKg: 6.49,
-      totalCost: 0
-    }
-  ]);
-  
-  // Calculated Fertilization values
-  const [totalFertilizerCost, setTotalFertilizerCost] = useState(0);
 
   // Vendas states
   const [wholesalePrice, setWholesalePrice] = useState(7.00);
@@ -220,32 +181,7 @@ export function Home () {
     soilAnalysisCost,
     wholesalePrice, retailPrice, wholesalePercentage,
   ]);
-
-  // useEffect para os cálculos da seção de adubação
-  useEffect(() => {
-    const updatedFertilizers = fertilizers.map(fert => {
-      const totalQuantity = (plants * fert.quantityPerPlant * fert.frequency) / 1000;
-      const totalCost = totalQuantity * fert.pricePerKg;
-      return {
-        ...fert,
-        totalQuantity,
-        totalCost
-      };
-    });
-
-    setFertilizers(updatedFertilizers);
-    setTotalFertilizerCost(updatedFertilizers.reduce((sum, fert) => sum + fert.totalCost, 0));
-  }, [plants, fertilizers]);
-
-  // Função auxiliar para atualizar um fertilizante específico
-  const updateFertilizer = (index: number, field: keyof Fertilizer, value: string | number) => {
-    const newFertilizers = [...fertilizers];
-    newFertilizers[index] = {
-      ...newFertilizers[index],
-      [field]: value
-    };
-    setFertilizers(newFertilizers);
-  };
+  
 
   // Funções auxiliares para card Resultado
   const calculatePercentage = (value: number, total: number) => {
@@ -260,17 +196,20 @@ export function Home () {
     return value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
   };
 
+
   // Variáveis retornadas dos COMPONENTES //
   const [laborCosts, setLaborCosts] = useState(0);
 
   const [soilPreparationCost, setSoilPreparationCost] = useState(0);
 
+  const [fertilizerCost, setFertilizerCost] = useState(0);
+
+
   // Seção RESULTADOS e DASHBOARD
   // // Calcular custos totais
-  const consumptionCosts = totalSeedlingsCost + totalFertilizerCost;
+  const consumptionCosts = totalSeedlingsCost + fertilizerCost;
   const serviceCosts = totalIrrigationCost + soilAnalysisCost + soilPreparationCost;
   
-
 
   const totalCosts = consumptionCosts + serviceCosts + laborCosts;
   
@@ -519,64 +458,44 @@ export function Home () {
         </CardContent>
       </Card>
 
-
+      
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Mudas</CardTitle>
-          <div className="text-lg font-medium">Categoria: Material de Consumo</div>
+          <CardTitle>Análise de solo</CardTitle>
+          <div className="text-lg font-medium">Categoria: Serviços</div>
         </CardHeader>
         <CardContent>
           <Table>
-            {/* <TableHeader>
-              <TableRow>
-                <TableHead className="text-center">Item</TableHead>
-                <TableHead className="text-center">Valor</TableHead>
-              </TableRow>
-            </TableHeader> */}
             <TableBody>
               <TableRow>
-                <TableCell>Quantidade (mudas)</TableCell>
-                <TableCell>{plants.toLocaleString('pt-BR')}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Reserva (%)</TableCell>
-                <TableCell className="space-y-2">                  
+                <TableCell>
+                  <Label>Fornecedor</Label>
                   <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={reservePercentage}
-                    onChange={(e) => setReservePercentage(Number(e.target.value))}
+                    value={soilAnalysisProvider}
+                    onChange={(e) => setSoilAnalysisProvider(e.target.value)}
                   />
                 </TableCell>
-                {/* <TableCell>{Math.ceil(plants * (reservePercentage / 100)).toLocaleString('pt-BR')}</TableCell> */}
-              </TableRow>
-              <TableRow>
-                <TableCell>Total de mudas (quant)</TableCell>
-                <TableCell>{totalSeedlings.toLocaleString('pt-BR')}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Valor unitário (R$)</TableCell>
-                <TableCell className="space-y-2">                  
+                <TableCell>
+                  <Label>Valor (R$)</Label>
                   <Input
                     type="number"
                     min="0"
                     step="0.01"
-                    value={seedlingUnitPrice}
-                    onChange={(e) => setSeedlingUnitPrice(Number(e.target.value))}
+                    value={soilAnalysisCost}
+                    onChange={(e) => setSoilAnalysisCost(Number(e.target.value))}
                   />
                 </TableCell>
-                {/* <TableCell>R$ {seedlingUnitPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell> */}
-              </TableRow>
-              <TableRow className="font-medium">
-                <TableCell>Total de mudas (R$)</TableCell>
-                <TableCell>R$ {totalSeedlingsCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+
+      <SoilPreparation 
+        area={calculatedArea} 
+        onTotalCostChange={(soil) => setSoilPreparationCost(soil)} 
+      />
 
 
       <Card className="w-full max-w-2xl">
@@ -714,116 +633,71 @@ export function Home () {
         </CardContent>
       </Card>
 
+
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Análise de solo</CardTitle>
-          <div className="text-lg font-medium">Categoria: Serviços</div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  <Label>Fornecedor</Label>
-                  <Input
-                    value={soilAnalysisProvider}
-                    onChange={(e) => setSoilAnalysisProvider(e.target.value)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Label>Valor (R$)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={soilAnalysisCost}
-                    onChange={(e) => setSoilAnalysisCost(Number(e.target.value))}
-                  />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-
-      <SoilPreparation 
-        area={calculatedArea} 
-        onTotalCostChange={(soil) => setSoilPreparationCost(soil)} 
-      />
-
-      
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Adubação (de Plantio)</CardTitle>
+          <CardTitle>Mudas</CardTitle>
           <div className="text-lg font-medium">Categoria: Material de Consumo</div>
         </CardHeader>
         <CardContent>
           <Table>
-            <TableHeader>
+            {/* <TableHeader>
               <TableRow>
-                <TableHead className="text-center">Fertilizante</TableHead>
-                <TableHead className="text-center">Quant/planta (g)</TableHead>
-                <TableHead className="text-center">Frequência</TableHead>
-                <TableHead className="text-center">Quantidade total (Kg)</TableHead>
-                <TableHead className="text-center">Preço/KG (R$)</TableHead>
-                <TableHead className="text-center">Custo fertilizante (R$)</TableHead>
+                <TableHead className="text-center">Item</TableHead>
+                <TableHead className="text-center">Valor</TableHead>
               </TableRow>
-            </TableHeader>
+            </TableHeader> */}
             <TableBody>
-              {fertilizers.map((fertilizer, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Input
-                      value={fertilizer.name}
-                      onChange={(e) => updateFertilizer(index, 'name', e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={fertilizer.quantityPerPlant}
-                      onChange={(e) => updateFertilizer(index, 'quantityPerPlant', Number(e.target.value))}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={fertilizer.frequency}
-                      onChange={(e) => updateFertilizer(index, 'frequency', Number(e.target.value))}
-                    />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    {fertilizer.totalQuantity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={fertilizer.pricePerKg}
-                      onChange={(e) => updateFertilizer(index, 'pricePerKg', Number(e.target.value))}
-                    />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    R$ {fertilizer.totalCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="font-medium">
-                <TableCell colSpan={5} className="text-right">Total de Fertilizantes</TableCell>
-                <TableCell className="text-center">
-                  R$ {totalFertilizerCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <TableRow>
+                <TableCell>Quantidade (mudas)</TableCell>
+                <TableCell>{plants.toLocaleString('pt-BR')}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Reserva (%)</TableCell>
+                <TableCell className="space-y-2">                  
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={reservePercentage}
+                    onChange={(e) => setReservePercentage(Number(e.target.value))}
+                  />
                 </TableCell>
+                {/* <TableCell>{Math.ceil(plants * (reservePercentage / 100)).toLocaleString('pt-BR')}</TableCell> */}
+              </TableRow>
+              <TableRow>
+                <TableCell>Total de mudas (quant)</TableCell>
+                <TableCell>{totalSeedlings.toLocaleString('pt-BR')}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Valor unitário (R$)</TableCell>
+                <TableCell className="space-y-2">                  
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={seedlingUnitPrice}
+                    onChange={(e) => setSeedlingUnitPrice(Number(e.target.value))}
+                  />
+                </TableCell>
+                {/* <TableCell>R$ {seedlingUnitPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell> */}
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total de mudas (R$)</TableCell>
+                <TableCell>R$ {totalSeedlingsCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+
+      
+      <FertilizerSection 
+        plants={plants}        
+        onFertilizerCostChange={(fertilizer) => setFertilizerCost(fertilizer)}
+      />
+
 
       <LaborSection 
         plants={plants}
@@ -939,26 +813,6 @@ export function Home () {
                 <TableCell className="text-right">100%</TableCell>
               </TableRow> */}
 
-              {/* Material de Consumo */}
-              <TableRow className="bg-slate-100">
-                <TableCell colSpan={3} className="font-medium">Material de Consumo</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="pl-8">Mudas</TableCell>
-                <TableCell className="text-right">{formatCurrency(totalSeedlingsCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost, totalRevenue))}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="pl-8">Adubação (de Plantio)</TableCell>
-                <TableCell className="text-right">{formatCurrency(totalFertilizerCost)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalFertilizerCost, totalRevenue))}</TableCell>
-              </TableRow>
-              <TableRow className="font-medium">
-                <TableCell>Total Material de Consumo</TableCell>
-                <TableCell className="text-right">{formatCurrency(consumptionCosts)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(consumptionCosts, totalRevenue))}</TableCell>
-              </TableRow>
-
               {/* Serviços */}
               <TableRow className="bg-slate-100">
                 <TableCell colSpan={3} className="font-medium">Serviços</TableCell>
@@ -983,6 +837,26 @@ export function Home () {
                 <TableCell className="text-right">{formatCurrency(serviceCosts)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(serviceCosts, totalRevenue))}</TableCell>
               </TableRow> 
+              
+              {/* Material de Consumo */}
+              <TableRow className="bg-slate-100">
+                <TableCell colSpan={3} className="font-medium">Material de Consumo</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Mudas</TableCell>
+                <TableCell className="text-right">{formatCurrency(totalSeedlingsCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost, totalRevenue))}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Adubação (de Plantio)</TableCell>
+                <TableCell className="text-right">{formatCurrency(fertilizerCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(fertilizerCost, totalRevenue))}</TableCell>
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total Material de Consumo</TableCell>
+                <TableCell className="text-right">{formatCurrency(consumptionCosts)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(consumptionCosts, totalRevenue))}</TableCell>
+              </TableRow>
 
               {/* Mão de obra */}
               <TableRow className="bg-slate-100">
