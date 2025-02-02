@@ -50,7 +50,7 @@ export function LaborSection({ plants, area, totalCycleDays, totalProductivity, 
 
   useEffect(() => {
     // Holes, fertilization and transplanting calculations
-    const holesLabor = Math.round(plants * 0.0020);
+    const holesLabor = Math.round(plants * 0.0034);
     const holesCost = holesLabor * dailyRate;
     setHolesLaborDays(holesLabor);
     setHolesLaborCost(holesCost);
