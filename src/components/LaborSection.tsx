@@ -56,7 +56,7 @@ export function LaborSection({ plants, area, totalCycleDays, totalProductivity, 
     setHolesLaborCost(holesCost);
 
     // Irrigation setup calculations
-    const irrigationLabor = Math.round(area * 0.0005);
+    const irrigationLabor = Math.round(area * 0.0005 * 10) / 10;
     const irrigationCost = irrigationLabor * dailyRate;
     setIrrigationLaborDays(irrigationLabor);
     setIrrigationLaborCost(irrigationCost);
