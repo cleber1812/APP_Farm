@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 interface Fertilizer {
     name: string;
     type: string;
+    applicationType: string;
     quantityPerPlant: number;
     frequency: number;
     totalQuantity: number;
@@ -28,18 +29,21 @@ interface Fertilizer {
   }
 
 interface FertilizerSectionProps {
-    plants: number;    
+    plants: number;  
+    totalCycleDays: number;  
     onFertilizerCostChange: (fertilizer: number) => void;  // nova prop
   }
 
 const FERTILIZER_TYPES = ["De plantio", "De cobertura", "Foliar"];
+const APPLICATION_TYPES = ["Única", "Semanal"] as const;  // usando 'as const' para tipagem literal
 
 
-export function FertilizerSection({ plants, onFertilizerCostChange }: FertilizerSectionProps) {    
+export function FertilizerSection({ plants, totalCycleDays, onFertilizerCostChange }: FertilizerSectionProps) {    
     const [fertilizers, setFertilizers] = useState<Fertilizer[]>([
         {
           name: "Uréia (N 45%)",
           type: "De plantio",
+          applicationType: "Única",
           quantityPerPlant: 6,
           frequency: 3,
           totalQuantity: 0,
@@ -49,6 +53,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
         {
           name: "Fosfato SuperSimples (H2PO4)",
           type: "De cobertura",
+          applicationType: "Semanal",
           quantityPerPlant: 40,
           frequency: 3,
           totalQuantity: 0,
@@ -58,6 +63,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
         {
           name: "Cloreto de Potássio (KCl 60%)",
           type: "Foliar",
+          applicationType: "Única",
           quantityPerPlant: 4,
           frequency: 3,
           totalQuantity: 0,
@@ -70,6 +76,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
     const [newFertilizer, setNewFertilizer] = useState<Partial<Fertilizer>>({
       name: "",
       type: "De plantio",
+      applicationType: "Única",
       quantityPerPlant: 0,
       frequency: 1,
       pricePerKg: 0
@@ -80,7 +87,13 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
 
     useEffect(() => {
         const updatedFertilizers = fertilizers.map(fert => {
-            const totalQuantity = (plants * fert.quantityPerPlant * fert.frequency) / 1000;
+
+            const weeksNumber = (totalCycleDays / 7) - 4;
+            
+            // Cálculo baseado no tipo de aplicação
+            const totalQuantity = fert.applicationType === "Única"
+              ? (plants * fert.quantityPerPlant * fert.frequency) / 1000  // Cálculo para aplicação única
+              : (plants * weeksNumber * fert.quantityPerPlant * fert.frequency) / 1000;
             const totalCost = totalQuantity * fert.pricePerKg;
             return {
                 ...fert,
@@ -90,7 +103,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
         });
 
         setFertilizers(updatedFertilizers);
-    }, [plants, fertilizers.map(f => `${f.quantityPerPlant}-${f.frequency}-${f.pricePerKg}`).join('-')]);
+    }, [plants, totalCycleDays, fertilizers.map(f => `${f.quantityPerPlant}-${f.frequency}-${f.pricePerKg}`).join('-')]);
 
     // Efeito separado para notificar mudanças no custo total
     useEffect(() => {
@@ -113,10 +126,11 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
   };
 
   const handleAddFertilizer = () => {
-    if (newFertilizer.name && newFertilizer.type && newFertilizer.quantityPerPlant && newFertilizer.frequency && newFertilizer.pricePerKg) {
+    if (newFertilizer.name && newFertilizer.type && newFertilizer.applicationType && newFertilizer.quantityPerPlant && newFertilizer.frequency && newFertilizer.pricePerKg) {
       const fertilizerToAdd: Fertilizer = {
         name: newFertilizer.name,
         type: newFertilizer.type,
+        applicationType: newFertilizer.applicationType,
         quantityPerPlant: Number(newFertilizer.quantityPerPlant),
         frequency: Number(newFertilizer.frequency),
         totalQuantity: 0,
@@ -128,6 +142,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
       setNewFertilizer({
         name: "",
         type: "De plantio",
+        applicationType: "Única",
         quantityPerPlant: 0,
         frequency: 1,
         pricePerKg: 0
@@ -141,7 +156,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
         <CardHeader>
           <div >
             <div>
-              <CardTitle>Adubação (de Plantio)</CardTitle>
+              <CardTitle>Adubação</CardTitle>
               <div className="text-lg font-medium">Categoria: Material de Consumo</div>
             </div>
             <div className="flex justify-end items-center">
@@ -178,6 +193,21 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
                       {FERTILIZER_TYPES.map((type) => (
                         <option key={type} value={type}>
                           {type}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="type">Tipo de Aplicação</Label>
+                    <select
+                      id="applicationType"
+                      value={newFertilizer.applicationType}
+                      onChange={(e) => setNewFertilizer({ ...newFertilizer, applicationType: e.target.value })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+                    >                      
+                      {APPLICATION_TYPES.map((applicationType) => (
+                        <option key={applicationType} value={applicationType}>
+                          {applicationType}
                         </option>
                       ))}
                     </select>
@@ -235,6 +265,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
               <TableRow>
                 <TableHead className="text-center">Fertilizante</TableHead>
                 <TableHead className="text-center">Tipo de Fertilizante</TableHead>
+                <TableHead className="text-center">Tipo de Aplicação</TableHead>
                 <TableHead className="text-center">Quant/planta (g)</TableHead>
                 <TableHead className="text-center">Frequência</TableHead>
                 <TableHead className="text-center">Quantidade total (Kg)</TableHead>
@@ -248,6 +279,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
                 <TableRow key={index}>
                   <TableCell>{fertilizer.name}</TableCell>
                   <TableCell>{fertilizer.type}</TableCell>
+                  <TableCell>{fertilizer.applicationType}</TableCell>
                   <TableCell>
                     <Input
                       type="number"
@@ -294,7 +326,7 @@ export function FertilizerSection({ plants, onFertilizerCostChange }: Fertilizer
                 </TableRow>
               ))}
               <TableRow className="font-medium">
-                <TableCell colSpan={6} className="text-right">Total de Fertilizantes</TableCell>
+                <TableCell colSpan={7} className="text-right">Total de Fertilizantes</TableCell>
                 <TableCell className="text-center">
                   R$ {totalFertilizerCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </TableCell>

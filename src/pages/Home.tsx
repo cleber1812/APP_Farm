@@ -524,7 +524,8 @@ export function Home () {
 
       
       <FertilizerSection 
-        plants={plants}        
+        plants={plants} 
+        totalCycleDays={totalCycleDays}       
         onFertilizerCostChange={(fertilizer) => setFertilizerCost(fertilizer)}
       />
 
