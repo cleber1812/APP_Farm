@@ -81,9 +81,30 @@ export function FertilizerSection({ plants, totalCycleDays, onFertilizerCostChan
       frequency: 1,
       pricePerKg: 0
     });
-      
+          
     // Remova o estado totalFertilizerCost e calcule-o diretamente
     const totalFertilizerCost = fertilizers.reduce((sum, fert) => sum + fert.totalCost, 0);
+
+    //Calculate subtotals for each fertilizer type
+    const getSubtotalByType = (type: string) => {
+      return fertilizers
+          .filter(fert => fert.type === type)
+          .reduce((sum, fert) => sum + fert.totalCost, 0);
+    };
+
+    // Adicione esta função antes do return
+    const getTypeStyle = (type: string) => {
+      switch (type) {
+          case "De plantio":
+              return "bg-green-600 text-green-50";
+          case "De cobertura":
+              return "bg-sky-600 text-sky-50";
+          case "Foliar":
+              return "bg-orange-800 text-orange-50";
+          default:
+              return "bg-blue-300 text-blue-800";
+      }
+    };
 
     useEffect(() => {
         const updatedFertilizers = fertilizers.map(fert => {
@@ -278,8 +299,14 @@ export function FertilizerSection({ plants, totalCycleDays, onFertilizerCostChan
               {fertilizers.map((fertilizer, index) => (
                 <TableRow key={index}>
                   <TableCell>{fertilizer.name}</TableCell>
-                  <TableCell>{fertilizer.type}</TableCell>
-                  <TableCell>{fertilizer.applicationType}</TableCell>
+                    <td><span className={`text-xs font-thin px-2 py-1 rounded-full ${getTypeStyle(fertilizer.type)}`}>
+                      {fertilizer.type}
+                    </span></td>
+                  
+                    <td><span className="text-xs font-thin px-2 py-1 rounded-full bg-neutral-600 text-neutral-50">
+                      {fertilizer.applicationType}
+                    </span></td>
+                  
                   <TableCell>
                     <Input
                       type="number"
@@ -325,7 +352,20 @@ export function FertilizerSection({ plants, totalCycleDays, onFertilizerCostChan
                   </TableCell>
                 </TableRow>
               ))}
-              <TableRow className="font-medium">
+              {/* Subtotals for each type */}
+              {FERTILIZER_TYPES.map(type => (
+                <TableRow key={type} className="bg-muted/50">
+                  <TableCell colSpan={7} className="text-right font-medium">
+                    Subtotal {type}
+                  </TableCell>
+                  <TableCell className="text-center font-medium">
+                    R$ {getSubtotalByType(type).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </TableCell>
+                  <TableCell />
+                </TableRow>
+              ))}
+              {/* Total geral */}
+              <TableRow className="font-medium border-t-2">
                 <TableCell colSpan={7} className="text-right">Total de Fertilizantes</TableCell>
                 <TableCell className="text-center">
                   R$ {totalFertilizerCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
