@@ -98,8 +98,36 @@ export function Home () {
     setThirdCycleQuant(thirdTotQuant);
 
     // Cycle start dates calculations
-    const secondStart = firstCycleStart + firstCycleDuration + 60;
-    const thirdStart = secondStart + secondCycleDuration + 60;
+    // const secondStart = firstCycleStart + firstCycleDuration + 60;
+    // const thirdStart = secondStart + secondCycleDuration + 60
+
+    let secondStart = 0;    
+    if (secondCycleProduction > 0) {
+      secondStart = firstCycleStart + firstCycleDuration + 60 
+          setSecondCycleDuration(90)
+    } else {
+      secondStart = firstCycleStart + firstCycleDuration + 0
+          setSecondCycleDuration(0)
+    }
+    
+    // let thirdStart = 0;    
+    // (thirdCycleProduction > 0) 
+    //       ? thirdStart = secondStart + secondCycleDuration + 60 
+    //       : thirdStart = secondStart + secondCycleDuration + 0
+
+    // const thirdStart = thirdCycleProduction > 0 
+    //       ? secondStart + secondCycleDuration + 60 
+    //       : secondStart + secondCycleDuration + 0
+
+    let thirdStart = 0;    
+    if (thirdCycleProduction > 0) {
+          thirdStart = secondStart + secondCycleDuration + 60 
+          setThirdCycleDuration(90)
+    } else {
+          thirdStart = secondStart + secondCycleDuration + 0
+          setThirdCycleDuration(0)
+    }
+    
     const totalDays = thirdStart + thirdCycleDuration;
     
     setSecondCycleStart(secondStart);
@@ -245,6 +273,7 @@ export function Home () {
                   id="rowSpacing"
                   type="number"
                   step="0.01"
+                  min="0"
                   value={rowSpacing}
                   onChange={(e) => setRowSpacing(Number(e.target.value))}
                 />
@@ -255,6 +284,7 @@ export function Home () {
                   id="plantSpacing"
                   type="number"
                   step="0.01"
+                  min="0"
                   value={plantSpacing}
                   onChange={(e) => setPlantSpacing(Number(e.target.value))}
                 />
@@ -311,6 +341,7 @@ export function Home () {
                   <Input
                     type="number"
                     step="0.1"
+                    min="0"
                     value={firstCycleProduction}
                     onChange={(e) => setFirstCycleProduction(Number(e.target.value))}
                   />
@@ -344,6 +375,7 @@ export function Home () {
                   <Input
                     type="number"
                     step="0.1"
+                    min="0"
                     value={secondCycleProduction}
                     onChange={(e) => setSecondCycleProduction(Number(e.target.value))}
                   />
@@ -378,6 +410,7 @@ export function Home () {
                   <Input
                     type="number"
                     step="0.1"
+                    min="0"
                     value={thirdCycleProduction}
                     onChange={(e) => setThirdCycleProduction(Number(e.target.value))}
                   />
@@ -551,6 +584,7 @@ export function Home () {
                 id="wholesale"
                 type="number"
                 step="0.01"
+                min="0"
                 value={wholesalePrice}
                 onChange={(e) => setWholesalePrice(Number(e.target.value))}
               />
@@ -562,6 +596,7 @@ export function Home () {
                 id="retail"
                 type="number"
                 step="0.01"
+                min="0"
                 value={retailPrice}
                 onChange={(e) => setRetailPrice(Number(e.target.value))}
               />
