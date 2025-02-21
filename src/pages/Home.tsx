@@ -558,6 +558,7 @@ export function Home () {
       
       <FertilizerSection 
         plants={plants} 
+        densityPerHectare={densityPerHectare}
         totalCycleDays={totalCycleDays}       
         onFertilizerCostChange={(fertilizer) => setFertilizerCost(fertilizer)}
       />
