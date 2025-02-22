@@ -36,7 +36,7 @@ interface FertilizerSectionProps {
     onFertilizerCostChange: (fertilizer: number) => void;  // nova prop
   }
 
-const FERTILIZER_TYPES = ["De plantio", "De cobertura", "Foliar"];
+const FERTILIZER_TYPES = ["De plantio", "De cobertura", "Foliar", "Defensivo"];
 const APPLICATION_TYPES = ["Única", "Semanal"] as const;  // usando 'as const' para tipagem literal
 
 
@@ -45,34 +45,45 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
         {
           name: "Uréia (N 45%)",
           type: "De plantio",
-          quantityPerHectare: 111,
+          quantityPerHectare: 110,
           quantityPerPlant: 0,
           applicationType: "Única",
-          frequency: 3,
+          frequency: 1,
           totalQuantity: 0,
-          pricePerKg: 3.99,
+          pricePerKg: 3.4,
           totalCost: 0
         },
         {
           name: "Fosfato SuperSimples (H2PO4)",
-          type: "De cobertura",
-          quantityPerHectare: 1111,
+          type: "De plantio",
+          quantityPerHectare: 1100,
           quantityPerPlant: 0,
           applicationType: "Única",
-          frequency: 3,
+          frequency: 1,
           totalQuantity: 0,
-          pricePerKg: 2.99,
+          pricePerKg: 2.3,
           totalCost: 0
         },
         {
           name: "Cloreto de Potássio (KCl 60%)",
-          type: "Foliar",
+          type: "De plantio",
           quantityPerHectare: 100,
           quantityPerPlant: 0,
           applicationType: "Única",
-          frequency: 3,
+          frequency: 1,
           totalQuantity: 0,
-          pricePerKg: 4.99,
+          pricePerKg: 3.2,
+          totalCost: 0
+        },
+        {
+          name: "Esterco bovino",
+          type: "De plantio",
+          quantityPerHectare: 2500,
+          quantityPerPlant: 0,
+          applicationType: "Única",
+          frequency: 1,
+          totalQuantity: 0,
+          pricePerKg: 1.25,
           totalCost: 0
         },
         {
@@ -83,9 +94,108 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
           applicationType: "Semanal",
           frequency: 1,
           totalQuantity: 0,
+          pricePerKg: 3.2,
+          totalCost: 0
+        },
+        {
+          name: "Cloreto de Potássio (KCl 60%)",
+          type: "De cobertura",
+          quantityPerHectare: 9,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 1,
+          totalQuantity: 0,
           pricePerKg: 4.99,
           totalCost: 0
-        }
+        },
+        {
+          name: "Sulfato de magnésio",
+          type: "De cobertura",
+          quantityPerHectare: 8.4,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 1,
+          totalQuantity: 0,
+          pricePerKg: 3.6,
+          totalCost: 0
+        },
+        {
+          name: "Nitrato de cálcio",
+          type: "De cobertura",
+          quantityPerHectare: 7.2,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 1,
+          totalQuantity: 0,
+          pricePerKg: 5,
+          totalCost: 0
+        },
+        {
+          name: "Sulfato de zinco",
+          type: "De cobertura",
+          quantityPerHectare: 12,
+          quantityPerPlant: 0,
+          applicationType: "Única",
+          frequency: 1,
+          totalQuantity: 0,
+          pricePerKg: 16,
+          totalCost: 0
+        },
+        {
+          name: "Nipokan",
+          type: "Foliar",
+          quantityPerHectare: 0.030,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 3,
+          totalQuantity: 0,
+          pricePerKg: 90,
+          totalCost: 0
+        },
+        {
+          name: "CaB2",
+          type: "Foliar",
+          quantityPerHectare: 0.050,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 3,
+          totalQuantity: 0,
+          pricePerKg: 55,
+          totalCost: 0
+        },
+        {
+          name: "Provado",
+          type: "Defensivo",
+          quantityPerHectare: 0.020,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 3,
+          totalQuantity: 0,
+          pricePerKg: 170,
+          totalCost: 0
+        },
+        {
+          name: "Dithane",
+          type: "Defensivo",
+          quantityPerHectare: 0.030,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 3,
+          totalQuantity: 0,
+          pricePerKg: 250,
+          totalCost: 0
+        },
+        {
+          name: "Difere",
+          type: "Defensivo",
+          quantityPerHectare: 0.030,
+          quantityPerPlant: 0,
+          applicationType: "Semanal",
+          frequency: 3,
+          totalQuantity: 0,
+          pricePerKg: 150,
+          totalCost: 0
+        },
       ]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,11 +222,13 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
     const getTypeStyle = (type: string) => {
       switch (type) {
           case "De plantio":
-              return "bg-green-600 text-green-50";
+              return "bg-orange-800 text-orange-50";
           case "De cobertura":
               return "bg-sky-600 text-sky-50";
           case "Foliar":
-              return "bg-orange-800 text-orange-50";
+              return "bg-green-600 text-green-50";
+          case "Defensivo":
+            return "bg-orange-500 text-orange-50";
           default:
               return "bg-blue-300 text-blue-800";
       }
@@ -143,7 +255,7 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
         });
 
         setFertilizers(updatedFertilizers);
-    }, [plants, densityPerHectare, totalCycleDays, fertilizers.map(f => `${f.quantityPerPlant}-${f.frequency}-${f.pricePerKg}`).join('-')]);
+    }, [plants, densityPerHectare, totalCycleDays, fertilizers.map(f => `${f.quantityPerHectare}-${f.quantityPerPlant}-${f.frequency}-${f.pricePerKg}`).join('-')]);
 
     // Efeito separado para notificar mudanças no custo total
     useEffect(() => {
@@ -304,16 +416,16 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-center">Fertilizante</TableHead>
-                <TableHead className="text-center">Tipo de Fertilizante</TableHead>
-                <TableHead className="text-center">Quant/ hectare(kg)</TableHead>
-                <TableHead className="text-center">Quant/ planta (g)</TableHead>
-                <TableHead className="text-center">Tipo de Aplicação</TableHead>
-                <TableHead className="text-center">Frequência</TableHead>
-                <TableHead className="text-center">Quantidade total (Kg)</TableHead>
-                <TableHead className="text-center">Preço/KG (R$)</TableHead>
-                <TableHead className="text-center">Custo fertilizante (R$)</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
+                <TableHead className="min-w-[150px] text-center">Fertilizante</TableHead>
+                <TableHead className="min-w-[120px] text-center">Tipo de Fertilizante</TableHead>
+                <TableHead className="min-w-[90px] text-center">Quant/hectare (kg)</TableHead>
+                <TableHead className="min-w-[90px] text-center">Quant/ planta (g)</TableHead>
+                <TableHead className="min-w-[90px] text-center">Tipo de Aplicação</TableHead>
+                <TableHead className="min-w-[90px] text-center">Frequência</TableHead>
+                <TableHead className="min-w-[90px] text-center">Quantidade total (Kg)</TableHead>
+                <TableHead className="min-w-[90px] text-center">Preço/KG (R$)</TableHead>
+                <TableHead className="min-w-[90px] text-center">Custo fertilizante (R$)</TableHead>
+                <TableHead className="min-w-[70px] text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

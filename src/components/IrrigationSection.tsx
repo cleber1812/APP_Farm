@@ -20,8 +20,8 @@ export function IrrigationSection({ rowSpacing, calculatedArea, totalCycleDays, 
     const [holesPerMeter, setHolesPerMeter] = useState(5);
     const [holeFlow, setHoleFlow] = useState(1.6);
     const [sprinklerFlow, setSprinklerFlow] = useState(75);
-    const [waterCost, setWaterCost] = useState(1.29);
-    const [pumpConsumption, setPumpConsumption] = useState(3.750);
+    const [waterCost, setWaterCost] = useState(0.16);
+    const [pumpConsumption, setPumpConsumption] = useState(0.750);
     const [energyCost, setEnergyCost] = useState(0.99);
 
     // Calculated irrigation values
