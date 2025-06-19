@@ -31,14 +31,16 @@ export function Home () {
   const [firstCycleStart, setFirstCycleStart] = useState(100);
   const [firstCycleDuration, setFirstCycleDuration] = useState(90);    
   const [secondCycleProduction, setSecondCycleProduction] = useState(0.50);
-  const [secondCycleDuration, setSecondCycleDuration] = useState(60);    
+  const [secondCycleDuration, setSecondCycleDuration] = useState(90);    
   const [thirdCycleProduction, setThirdCycleProduction] = useState(0.25);
-  const [thirdCycleDuration, setThirdCycleDuration] = useState(60);
+  const [thirdCycleDuration, setThirdCycleDuration] = useState(90);
 
   // Calculated states    
   const [firstCycleQuant, setFirstCycleQuant] = useState(0);
+  const [firstCycleDormancy, setFirstCycleDormancy] = useState(0);
   const [secondCycleQuant, setSecondCycleQuant] = useState(0);
   const [secondCycleStart, setSecondCycleStart] = useState(0);
+  const [secondCycleDormancy, setSecondCycleDormancy] = useState(0);
   const [thirdCycleQuant, setThirdCycleQuant] = useState(0);
   const [thirdCycleStart, setThirdCycleStart] = useState(0);
   const [totalCycleDays, setTotalCycleDays] = useState(0);
@@ -69,7 +71,33 @@ export function Home () {
   // Investimentos values
   const [irrigationInvestCost, setIrrigationInvestCost] = useState(4900.99);
   const [machineInvestCost , setMachineInvestCost] = useState(1800.95);
+  
+  //Permite atualizar campo SecondCycleDuration 
+  useEffect(() => {
+    if (secondCycleProduction > 0) {
+            setFirstCycleDormancy(60)
+            setSecondCycleDuration(90)
+    } else {
+            setFirstCycleDormancy(0)
+            setSecondCycleDuration(0)
+            setThirdCycleProduction(0)
+            setSecondCycleDormancy(0)
+            setThirdCycleDuration(0)
+    }
+  }, [secondCycleProduction]); 
 
+  //Permite atualizar campo ThirdCycleDuration 
+  useEffect(() => {
+    if (thirdCycleProduction > 0) {
+            setSecondCycleDormancy(60)
+            setThirdCycleDuration(90)
+    } else {
+            setSecondCycleDormancy(0)
+            setThirdCycleDuration(0)
+    }
+  }, [thirdCycleProduction]);
+
+  //Use effect para os demais campos
   useEffect(() => {
     // Área calculations
     const density = 10000 / (rowSpacing * plantSpacing);
@@ -98,17 +126,16 @@ export function Home () {
     setThirdCycleQuant(thirdTotQuant);
 
     // Cycle start dates calculations
-    // const secondStart = firstCycleStart + firstCycleDuration + 60;
-    // const thirdStart = secondStart + secondCycleDuration + 60
+    
+    // let secondStart = 0;    
+    // if (secondCycleProduction > 0) {
+    //   secondStart = firstCycleStart + firstCycleDuration + 60 
+    //       setSecondCycleDuration(90)
+    // } else {
+    //   secondStart = firstCycleStart + firstCycleDuration + 0
+    //       setSecondCycleDuration(0)
+    // }
 
-    let secondStart = 0;    
-    if (secondCycleProduction > 0) {
-      secondStart = firstCycleStart + firstCycleDuration + 60 
-          setSecondCycleDuration(90)
-    } else {
-      secondStart = firstCycleStart + firstCycleDuration + 0
-          setSecondCycleDuration(0)
-    }
     
     // let thirdStart = 0;    
     // (thirdCycleProduction > 0) 
@@ -119,14 +146,17 @@ export function Home () {
     //       ? secondStart + secondCycleDuration + 60 
     //       : secondStart + secondCycleDuration + 0
 
-    let thirdStart = 0;    
-    if (thirdCycleProduction > 0) {
-          thirdStart = secondStart + secondCycleDuration + 60 
-          setThirdCycleDuration(90)
-    } else {
-          thirdStart = secondStart + secondCycleDuration + 0
-          setThirdCycleDuration(0)
-    }
+    // let thirdStart = 0;    
+    // if (thirdCycleProduction > 0) {
+    //       thirdStart = secondStart + secondCycleDuration + 60 
+    //       setThirdCycleDuration(90)
+    // } else {
+    //       thirdStart = secondStart + secondCycleDuration + 0
+    //       setThirdCycleDuration(0)
+    // }     
+
+    const secondStart = firstCycleStart + firstCycleDuration + firstCycleDormancy;
+    const thirdStart = secondStart + secondCycleDuration + secondCycleDormancy
     
     const totalDays = thirdStart + thirdCycleDuration;
     
