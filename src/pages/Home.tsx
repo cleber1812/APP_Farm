@@ -47,6 +47,19 @@ export function Home () {
   const [perPlantProductivity, setPerPlantProductivity] = useState(0);
   const [totalProductivity, setTotalProductivity] = useState(0);
 
+  // Terreno states
+  const [terrenoType, setTerrenoType] = useState("byHectare");
+  const [valorAluguelHaAnual, setValorAluguelHaAnual] = useState(2000);
+  const [custoAluguelAreaFixo, setCustoAluguelAreaFixo] = useState(1000);
+  const [valorVenalHa, setValorVenalHa] = useState(50000);
+  const [taxaJurosAnual, setTaxaJurosAnual] = useState(8);
+
+  // Calculated Terreno values
+  const [custoAluguelProporcional, setCustoAluguelProporcional] = useState(0);
+  const [custoAluguelPorHa, setCustoAluguelPorHa] = useState(0);
+  const [custoOportunidadeAno, setCustoOportunidadeAno] = useState(0);
+  const [custoTerreno, setCustoTerreno] = useState(0);
+
   // Mudas states
   const [reservePercentage, setReservePercentage] = useState(10);
   const [seedlingUnitPrice, setSeedlingUnitPrice] = useState(0.20);
@@ -68,9 +81,14 @@ export function Home () {
   const [perKgRevenue, setPerKgRevenue] = useState(0);
   const [totalRevenue, setTotalRevenue] = useState(0);
 
-  // Investimentos values
+  // Investimentos states
   const [irrigationInvestCost, setIrrigationInvestCost] = useState(4900.99);
   const [machineInvestCost , setMachineInvestCost] = useState(1800.95);
+  const [depreciationInterest , setDepreciationInterest] = useState(20);
+
+  // Calculated Investimentos values
+  const [anualDepreciation , setAnualDepreciation] = useState(0);
+  const [depreciationCost  , setDepreciationCost ] = useState(0);
   
   //Permite atualizar campo SecondCycleDuration 
   useEffect(() => {
@@ -114,8 +132,8 @@ export function Home () {
       );
       setPlants(calculatedPlants)
       setCalculatedArea(area)
-    }    
-
+    }
+    
     // Cycle production calculations
     const firstTotQuant = firstCycleProduction * plants;
     const secondTotQuant = secondCycleProduction * plants;
@@ -171,6 +189,20 @@ export function Home () {
     const totalProd = plants * perPlantProd;
     setTotalProductivity(totalProd);
 
+
+    // Terreno calculations
+    if (terrenoType === "byHectare") {
+      setCustoAluguelProporcional(valorAluguelHaAnual * (calculatedArea / 10000));
+      setCustoTerreno(valorAluguelHaAnual * (calculatedArea / 10000) * (totalCycleDays / 360))
+    } else if (terrenoType === "byFixo") {
+      setCustoAluguelPorHa(custoAluguelAreaFixo / (calculatedArea / 10000));
+      setCustoTerreno(custoAluguelAreaFixo * (totalCycleDays / 360));
+    } else {
+      setCustoOportunidadeAno(valorVenalHa * (taxaJurosAnual / 100) * (calculatedArea / 10000));
+      setCustoTerreno(valorVenalHa * (taxaJurosAnual / 100) * (calculatedArea / 10000) * (totalCycleDays / 360));
+    } 
+
+
     // SECAO MUDAS
     // Calcula o total de mudas (quantidade + reserva)
     const reserveAmount = Math.ceil(plants * (reservePercentage / 100));
@@ -180,7 +212,6 @@ export function Home () {
     // Calcula o custo total das mudas
     const totalCost = totalSeedlingsCalc * seedlingUnitPrice;
     setTotalSeedlingsCost(totalCost);
-
     
     
     // SECAO VENDAS
@@ -191,6 +222,13 @@ export function Home () {
 
     setTotalRevenue((wholesaleRevenue + retailRevenue)*totalProd);
 
+
+    // SECAO DEPRECIAÇÃO
+    const depreciacaoAnual = totalInvestiments * (depreciationInterest  / 100);
+    setAnualDepreciation(depreciacaoAnual);
+    const depreciacaoCiclo = totalInvestiments * (depreciationInterest  / 100) * (totalCycleDays / 360);
+    setDepreciationCost (depreciacaoCiclo);
+
   }, [plants, area, rowSpacing, plantSpacing, calculationType,
     firstCycleProduction, secondCycleProduction, thirdCycleProduction,
     firstCycleStart, firstCycleDuration, secondCycleDuration, thirdCycleDuration,
@@ -198,6 +236,8 @@ export function Home () {
     totalCycleDays, calculatedArea,    
     soilAnalysisCost,
     wholesalePrice, retailPrice, wholesalePercentage,
+    terrenoType, valorAluguelHaAnual, custoAluguelAreaFixo, valorVenalHa, taxaJurosAnual,
+    irrigationInvestCost, machineInvestCost, depreciationInterest,
   ]);
   
 
@@ -229,9 +269,10 @@ export function Home () {
   // // Calcular custos totais
   const consumptionCosts = totalSeedlingsCost + fertilizerCost;
   const serviceCosts = irrigationCosts + soilAnalysisCost + soilPreparationCost;
+  const indirectCosts = custoTerreno + depreciationCost;
   
 
-  const totalCosts = consumptionCosts + serviceCosts + laborCosts;
+  const totalCosts = consumptionCosts + serviceCosts + laborCosts + indirectCosts;
   
   const totalInvestiments = irrigationInvestCost + machineInvestCost;
 
@@ -654,6 +695,113 @@ export function Home () {
           </Table>
         </CardContent>
       </Card>
+      
+
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Custo da terra</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <RadioGroup
+            defaultValue="byHectare"
+            onValueChange={setTerrenoType}
+            className="space-y-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="byHectare" id="byHectare" />
+              <Label htmlFor="byHectare">Aluguel por hectare</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="byFixo" id="byFixo" />
+              <Label htmlFor="byFixo">Aluguel por área utilizada</Label>
+            </div>
+             <div className="flex items-center space-x-2">
+              <RadioGroupItem value="byProprio" id="byProprio" />
+              <Label htmlFor="byProprio">Terreno próprio</Label>
+            </div>
+          </RadioGroup>
+
+          {terrenoType === "byHectare" ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="pt-2">
+                <Label htmlFor="hectare">Valor do aluguel anual por hectare (R$)</Label>
+                <Input
+                  id="hectare"
+                  type="number"
+                  value={valorAluguelHaAnual}
+                  onChange={(e) => setValorAluguelHaAnual(Number(e.target.value))}
+                />
+              </div>
+              <div className="pt-2">
+                <Label>Custo do aluguel proporcional à área (R$)</Label>
+                <p className="text-lg font-medium">
+                  R$ {custoAluguelProporcional.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+            
+            ) : terrenoType === "byFixo" ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="pt-2">
+                <Label htmlFor="fixo">Custo do aluguel anual da área plantada (R$)</Label>
+                <Input
+                  id="fixo"
+                  type="number"
+                  value={custoAluguelAreaFixo}
+                  onChange={(e) => setCustoAluguelAreaFixo(Number(e.target.value))}
+                />
+              </div>
+              <div className="pt-2">
+                <Label>Equivalente do custo por hectare/ano (R$)</Label>
+                <p className="text-lg font-medium">
+                  R$ {custoAluguelPorHa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+
+            ) : (
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div className="pt-2">
+                <Label htmlFor="proprio">Valor venal por hectare (R$)</Label>
+                <Input
+                  id="proprio"
+                  type="number"
+                  value={valorVenalHa}
+                  onChange={(e) => setValorVenalHa(Number(e.target.value))}
+                />
+              </div>
+              <div className="pt-2">
+                <Label htmlFor="interest">Taxa de juros anual (%)</Label>
+                <Input
+                  id="interest"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={taxaJurosAnual}
+                  onChange={(e) => setTaxaJurosAnual(Number(e.target.value))}
+                />
+              </div>
+              <div className="pt-2">
+                <Label>Custo de oportunidade proporcional por ano (R$)</Label>
+                <p className="text-lg font-medium">
+                  R$ {custoOportunidadeAno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+
+          )}
+
+          <div className="space-y-4">            
+            <div className="flex items-center justify-between">              
+              <Label>Custo do terreno por ciclo (R$)</Label>
+              <p className="text-lg font-medium">
+                R$ {custoTerreno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
 
       <Card className="w-full max-w-2xl">
@@ -689,7 +837,28 @@ export function Home () {
               <TableRow className="font-medium">
                 <TableCell>Total Investimentos</TableCell>
                 <TableCell className="text-right">{formatCurrency(totalInvestiments)}</TableCell>                
-              </TableRow>
+              </TableRow>              
+              <TableRow className="font-medium">
+                <TableCell>Taxa de depreciação anual (%)</TableCell>
+                <TableCell>
+                  {/* <Label>Taxa de depreciação anual (%)</Label> */}
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={depreciationInterest}
+                      onChange={(e) => setDepreciationInterest(Number(e.target.value))}
+                    />
+                  </TableCell>
+              </TableRow>  
+              <TableRow>
+                  <TableCell>Depreciação por ano (R$)</TableCell>
+                  <TableCell className="text-right">{formatCurrency(anualDepreciation)}</TableCell>
+              </TableRow>  
+              <TableRow>  
+                  <TableCell>Custo de Depreciação por ciclo (R$)</TableCell>
+                  <TableCell className="text-right">{formatCurrency(depreciationCost)}</TableCell>
+              </TableRow>              
             </TableBody>
           </Table>
         </CardContent>
@@ -745,7 +914,7 @@ export function Home () {
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(totalSeedlingsCost, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="pl-8">Adubação (de Plantio)</TableCell>
+                <TableCell className="pl-8">Adubação</TableCell>
                 <TableCell className="text-right">{formatCurrency(fertilizerCost)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(fertilizerCost, totalRevenue))}</TableCell>
               </TableRow>
@@ -763,7 +932,27 @@ export function Home () {
                 <TableCell>Total Mão de obra</TableCell>
                 <TableCell className="text-right">{formatCurrency(laborCosts)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(laborCosts, totalRevenue))}</TableCell>
+              </TableRow>  
+
+              {/* Custos indiretos */}
+              <TableRow className="bg-slate-100">
+                <TableCell colSpan={3} className="font-medium">Custos indiretos</TableCell>
               </TableRow>              
+              <TableRow>
+                <TableCell>Custo da terra</TableCell>
+                <TableCell className="text-right">{formatCurrency(custoTerreno)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(custoTerreno, totalRevenue))}</TableCell>
+              </TableRow> 
+              <TableRow>
+                <TableCell>Depreciação</TableCell>
+                <TableCell className="text-right">{formatCurrency(depreciationCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(depreciationCost, totalRevenue))}</TableCell>
+              </TableRow>
+              <TableRow className="font-medium">
+                <TableCell>Total Custos Indiretos</TableCell>
+                <TableCell className="text-right">{formatCurrency(indirectCosts)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(indirectCosts, totalRevenue))}</TableCell>
+              </TableRow>           
 
               {/* Lucro Líquido */}
               {/* <TableRow className="font-medium text-lg border-t-2">

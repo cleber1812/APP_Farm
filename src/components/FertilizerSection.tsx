@@ -198,6 +198,7 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
         },
       ]);
 
+    // Modal Novo Fertilizantes
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newFertilizer, setNewFertilizer] = useState<Partial<Fertilizer>>({
       name: "",
@@ -208,7 +209,7 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
       pricePerKg: 0
     });
           
-    // Remova o estado totalFertilizerCost e calcule-o diretamente
+    // totalFertilizerCost calculado diretamente
     const totalFertilizerCost = fertilizers.reduce((sum, fert) => sum + fert.totalCost, 0);
 
     //Calculate subtotals for each fertilizer type
@@ -218,7 +219,7 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
           .reduce((sum, fert) => sum + fert.totalCost, 0);
     };
 
-    // Adicione esta função antes do return
+    // Função para as cores dos Badges
     const getTypeStyle = (type: string) => {
       switch (type) {
           case "De plantio":
@@ -445,7 +446,7 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
                     />
                   </TableCell>
                   <TableCell className="text-center">
-                    {fertilizer.quantityPerPlant.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {fertilizer.quantityPerPlant.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}
                   </TableCell>
                   <td><span className="text-xs font-thin px-2 py-1 rounded-full bg-neutral-600 text-neutral-50">
                     {fertilizer.applicationType}
@@ -460,7 +461,7 @@ export function FertilizerSection({ plants, densityPerHectare, totalCycleDays, o
                     />
                   </TableCell>
                   <TableCell className="text-center">
-                    {fertilizer.totalQuantity.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {fertilizer.totalQuantity.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}
                   </TableCell>
                   <TableCell>
                     <Input
