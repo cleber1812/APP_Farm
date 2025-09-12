@@ -27,12 +27,12 @@ export function Home () {
   const [calculatedPlants, setCalculatedPlants] = useState(0);
 
   // Produtividade states
-  const [firstCycleProduction, setFirstCycleProduction] = useState(1.00);
+  const [firstCycleProduction, setFirstCycleProduction] = useState(0.900);
   const [firstCycleStart, setFirstCycleStart] = useState(100);
-  const [firstCycleDuration, setFirstCycleDuration] = useState(90);    
-  const [secondCycleProduction, setSecondCycleProduction] = useState(0.50);
+  const [firstCycleDuration, setFirstCycleDuration] = useState(180);    
+  const [secondCycleProduction, setSecondCycleProduction] = useState(0.000);
   const [secondCycleDuration, setSecondCycleDuration] = useState(90);    
-  const [thirdCycleProduction, setThirdCycleProduction] = useState(0.25);
+  const [thirdCycleProduction, setThirdCycleProduction] = useState(0.000);
   const [thirdCycleDuration, setThirdCycleDuration] = useState(90);
 
   // Calculated states    
