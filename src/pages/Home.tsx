@@ -48,17 +48,17 @@ export function Home () {
   const [totalProductivity, setTotalProductivity] = useState(0);
 
   // Terreno states
-  const [terrenoType, setTerrenoType] = useState("byHectare");
-  const [valorAluguelHaAnual, setValorAluguelHaAnual] = useState(2000);
-  const [custoAluguelAreaFixo, setCustoAluguelAreaFixo] = useState(1000);
-  const [valorVenalHa, setValorVenalHa] = useState(50000);
-  const [taxaJurosAnual, setTaxaJurosAnual] = useState(8);
+  const [landType, setLandType] = useState("byHectare");
+  const [annualRentPerHectare , setAnnualRentPerHectare ] = useState(2000);
+  const [fixedAreaRentCost, setFixedAreaRentCost] = useState(1000);
+  const [hectareSalesValue, setHectareSalesValue] = useState(50000);
+  const [annualInterestRate, setAnnualInterestRate] = useState(6);
 
   // Calculated Terreno values
-  const [custoAluguelProporcional, setCustoAluguelProporcional] = useState(0);
-  const [custoAluguelPorHa, setCustoAluguelPorHa] = useState(0);
-  const [custoOportunidadeAno, setCustoOportunidadeAno] = useState(0);
-  const [custoTerreno, setCustoTerreno] = useState(0);
+  const [proportionalRentCost, setProportionalRentCost] = useState(0);
+  const [rentCostPerHectare, setRentCostPerHectare] = useState(0);
+  const [opportunityCostYear, setOpportunityCostYear] = useState(0);
+  const [landCost, setLandCost] = useState(0);
 
   // Mudas states
   const [reservePercentage, setReservePercentage] = useState(10);
@@ -70,10 +70,10 @@ export function Home () {
   
   // Análise de Solo states
   const [soilAnalysisProvider, setSoilAnalysisProvider] = useState("Epamig");
-  const [soilAnalysisCost, setSoilAnalysisCost] = useState(120.99);
+  const [soilAnalysisCost, setSoilAnalysisCost] = useState(120.00);
 
   // Vendas states
-  const [wholesalePrice, setWholesalePrice] = useState(7.00);
+  const [wholesalePrice, setWholesalePrice] = useState(6.00);
   const [retailPrice, setRetailPrice] = useState(12.00);
   const [wholesalePercentage, setWholesalePercentage] = useState(70);
 
@@ -82,9 +82,9 @@ export function Home () {
   const [totalRevenue, setTotalRevenue] = useState(0);
 
   // Investimentos states
-  const [irrigationInvestCost, setIrrigationInvestCost] = useState(4900.99);
-  const [machineInvestCost , setMachineInvestCost] = useState(1800.95);
-  const [depreciationInterest , setDepreciationInterest] = useState(20);
+  const [irrigationInvestCost, setIrrigationInvestCost] = useState(5000.00);
+  const [machineInvestCost , setMachineInvestCost] = useState(2000.00);
+  const [depreciationInterest , setDepreciationInterest] = useState(10);
 
   // Calculated Investimentos values
   const [anualDepreciation , setAnualDepreciation] = useState(0);
@@ -191,15 +191,15 @@ export function Home () {
 
 
     // Terreno calculations
-    if (terrenoType === "byHectare") {
-      setCustoAluguelProporcional(valorAluguelHaAnual * (calculatedArea / 10000));
-      setCustoTerreno(valorAluguelHaAnual * (calculatedArea / 10000) * (totalCycleDays / 360))
-    } else if (terrenoType === "byFixo") {
-      setCustoAluguelPorHa(custoAluguelAreaFixo / (calculatedArea / 10000));
-      setCustoTerreno(custoAluguelAreaFixo * (totalCycleDays / 360));
+    if (landType === "byHectare") {
+      setProportionalRentCost(annualRentPerHectare * (calculatedArea / 10000));
+      setLandCost (annualRentPerHectare * (calculatedArea / 10000) * (totalCycleDays / 360))
+    } else if (landType === "byFixo") {
+      setRentCostPerHectare(fixedAreaRentCost / (calculatedArea / 10000));
+      setLandCost(fixedAreaRentCost * (totalCycleDays / 360));
     } else {
-      setCustoOportunidadeAno(valorVenalHa * (taxaJurosAnual / 100) * (calculatedArea / 10000));
-      setCustoTerreno(valorVenalHa * (taxaJurosAnual / 100) * (calculatedArea / 10000) * (totalCycleDays / 360));
+      setOpportunityCostYear(hectareSalesValue * (annualInterestRate / 100) * (calculatedArea / 10000));
+      setLandCost(hectareSalesValue * (annualInterestRate / 100) * (calculatedArea / 10000) * (totalCycleDays / 360));
     } 
 
 
@@ -236,7 +236,7 @@ export function Home () {
     totalCycleDays, calculatedArea,    
     soilAnalysisCost,
     wholesalePrice, retailPrice, wholesalePercentage,
-    terrenoType, valorAluguelHaAnual, custoAluguelAreaFixo, valorVenalHa, taxaJurosAnual,
+    landType, annualRentPerHectare, fixedAreaRentCost, hectareSalesValue, annualInterestRate,
     irrigationInvestCost, machineInvestCost, depreciationInterest,
   ]);
   
@@ -269,7 +269,7 @@ export function Home () {
   // // Calcular custos totais
   const consumptionCosts = totalSeedlingsCost + fertilizerCost;
   const serviceCosts = irrigationCosts + soilAnalysisCost + soilPreparationCost;
-  const indirectCosts = custoTerreno + depreciationCost;
+  const indirectCosts = landCost + depreciationCost;
   
 
   const totalCosts = consumptionCosts + serviceCosts + laborCosts + indirectCosts;
@@ -704,7 +704,7 @@ export function Home () {
         <CardContent className="space-y-6">
           <RadioGroup
             defaultValue="byHectare"
-            onValueChange={setTerrenoType}
+            onValueChange={setLandType}
             className="space-y-2"
           >
             <div className="flex items-center space-x-2">
@@ -721,40 +721,40 @@ export function Home () {
             </div>
           </RadioGroup>
 
-          {terrenoType === "byHectare" ? (
+          {landType === "byHectare" ? (
             <div className="grid grid-cols-2 gap-4">
               <div className="pt-2">
                 <Label htmlFor="hectare">Valor do aluguel anual por hectare (R$)</Label>
                 <Input
                   id="hectare"
                   type="number"
-                  value={valorAluguelHaAnual}
-                  onChange={(e) => setValorAluguelHaAnual(Number(e.target.value))}
+                  value={annualRentPerHectare }
+                  onChange={(e) => setAnnualRentPerHectare (Number(e.target.value))}
                 />
               </div>
               <div className="pt-2">
                 <Label>Custo do aluguel proporcional à área (R$)</Label>
                 <p className="text-lg font-medium">
-                  R$ {custoAluguelProporcional.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  R$ {proportionalRentCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
             
-            ) : terrenoType === "byFixo" ? (
+            ) : landType === "byFixo" ? (
             <div className="grid grid-cols-2 gap-4">
               <div className="pt-2">
                 <Label htmlFor="fixo">Custo do aluguel anual da área plantada (R$)</Label>
                 <Input
                   id="fixo"
                   type="number"
-                  value={custoAluguelAreaFixo}
-                  onChange={(e) => setCustoAluguelAreaFixo(Number(e.target.value))}
+                  value={fixedAreaRentCost}
+                  onChange={(e) => setFixedAreaRentCost(Number(e.target.value))}
                 />
               </div>
               <div className="pt-2">
                 <Label>Equivalente do custo por hectare/ano (R$)</Label>
                 <p className="text-lg font-medium">
-                  R$ {custoAluguelPorHa.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  R$ {rentCostPerHectare.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -767,8 +767,8 @@ export function Home () {
                 <Input
                   id="proprio"
                   type="number"
-                  value={valorVenalHa}
-                  onChange={(e) => setValorVenalHa(Number(e.target.value))}
+                  value={hectareSalesValue}
+                  onChange={(e) => setHectareSalesValue(Number(e.target.value))}
                 />
               </div>
               <div className="pt-2">
@@ -778,14 +778,14 @@ export function Home () {
                   type="number"
                   step="0.01"
                   min="0"
-                  value={taxaJurosAnual}
-                  onChange={(e) => setTaxaJurosAnual(Number(e.target.value))}
+                  value={annualInterestRate}
+                  onChange={(e) => setAnnualInterestRate(Number(e.target.value))}
                 />
               </div>
               <div className="pt-2">
                 <Label>Custo de oportunidade proporcional por ano (R$)</Label>
                 <p className="text-lg font-medium">
-                  R$ {custoOportunidadeAno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  R$ {opportunityCostYear.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
@@ -796,7 +796,7 @@ export function Home () {
             <div className="flex items-center justify-between">              
               <Label>Custo do terreno por ciclo (R$)</Label>
               <p className="text-lg font-medium">
-                R$ {custoTerreno.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                R$ {landCost.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>
@@ -940,8 +940,8 @@ export function Home () {
               </TableRow>              
               <TableRow>
                 <TableCell>Custo da terra</TableCell>
-                <TableCell className="text-right">{formatCurrency(custoTerreno)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(custoTerreno, totalRevenue))}</TableCell>
+                <TableCell className="text-right">{formatCurrency(landCost)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(landCost, totalRevenue))}</TableCell>
               </TableRow> 
               <TableRow>
                 <TableCell>Depreciação</TableCell>

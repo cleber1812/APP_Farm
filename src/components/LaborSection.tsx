@@ -19,7 +19,7 @@ export function LaborSection({ plants, area, totalCycleDays, totalProductivity, 
   const [dailyRate, setDailyRate] = useState(80.00);
   
   // Pesticide application states
-  const [timesPerWeek, setTimesPerWeek] = useState(3);
+  const [timesPerWeek, setTimesPerWeek] = useState(1);
   
   // Weeding states
   const [timesPerMonth, setTimesPerMonth] = useState(1);

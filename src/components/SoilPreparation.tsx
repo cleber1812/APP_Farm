@@ -12,7 +12,7 @@ interface SoilPreparationProps {
 
 export function SoilPreparation({ area, onTotalCostChange }: SoilPreparationProps) {
   const [preparationType, setPreparationType] = useState("byMachine");
-  const [machineHourPrice, setMachineHourPrice] = useState(179.98);
+  const [machineHourPrice, setMachineHourPrice] = useState(200.00);
   const [gradeHours, setGradeHours] = useState(0);
   const [aradoHours, setAradoHours] = useState(0);
   const [servicePrice, setServicePrice] = useState(0);
