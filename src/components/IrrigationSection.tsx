@@ -17,7 +17,7 @@ export function IrrigationSection({ rowSpacing, calculatedArea, totalCycleDays, 
     // Irrigation states
     const [irrigationType, setIrrigationType] = useState("dripping");
     const [irrigationHours, setIrrigationHours] = useState(1);
-    const [holesPerMeter, setHolesPerMeter] = useState(5);
+    const [spacingBetweenDrippers, setSpacingBetweenDrippers] = useState(20);
     const [holeFlow, setHoleFlow] = useState(1.6);
     const [sprinklerFlow, setSprinklerFlow] = useState(75);
     const [waterCost, setWaterCost] = useState(0.16);
@@ -50,7 +50,7 @@ export function IrrigationSection({ rowSpacing, calculatedArea, totalCycleDays, 
         let waterQty = 0;
 
         if (irrigationType === "dripping") {
-        waterQty = (totalCycleDays * irrigationHours * hoseLength * holeFlow * holesPerMeter) / 1000;    
+        waterQty = (totalCycleDays * irrigationHours * hoseLength * holeFlow * (100 / spacingBetweenDrippers)) / 1000;    
         } else {
         waterQty = (totalCycleDays * irrigationHours * sprinklersCount * sprinklerFlow) / 1000;
         }
@@ -76,7 +76,7 @@ export function IrrigationSection({ rowSpacing, calculatedArea, totalCycleDays, 
 
     }, [calculatedArea, rowSpacing,
         sprinklersCount,
-        irrigationType, irrigationHours, holeFlow, holesPerMeter, sprinklerFlow, waterCost, pumpConsumption, energyCost,
+        irrigationType, irrigationHours, holeFlow, spacingBetweenDrippers, sprinklerFlow, waterCost, pumpConsumption, energyCost,
         onIrrigationCostChange // importante adicionar na dependência do useEffect
     ]);
 
@@ -183,15 +183,15 @@ export function IrrigationSection({ rowSpacing, calculatedArea, totalCycleDays, 
 
                 <TableRow>
                     <TableCell>
-                    <Label htmlFor="holesPerMeter">Furos por metro</Label>
+                    <Label htmlFor="spacingBetweenDrippers">Espaço entre gotejadores (cm) </Label>
                     </TableCell>
                     <TableCell>
                     <Input
-                        id="holesPerMeter"
+                        id="spacingBetweenDrippers"
                         type="number"
                         step="1"
-                        value={holesPerMeter}
-                        onChange={(e) => setHolesPerMeter(Number(e.target.value))}
+                        value={spacingBetweenDrippers}
+                        onChange={(e) => setSpacingBetweenDrippers(Number(e.target.value))}
                     />
                     </TableCell>
                 </TableRow>

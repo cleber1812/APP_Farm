@@ -19,7 +19,7 @@ export function Home () {
   const [plants, setPlants] = useState(1000);
   const [area, setArea] = useState(2000);
   const [rowSpacing, setRowSpacing] = useState(1.00);
-  const [plantSpacing, setPlantSpacing] = useState(0.40);
+  const [plantSpacing, setPlantSpacing] = useState(0.60);
 
   // Calculated Plantel values
   const [densityPerHectare, setDensityPerHectare] = useState(0);
@@ -62,7 +62,7 @@ export function Home () {
 
   // Mudas states
   const [reservePercentage, setReservePercentage] = useState(10);
-  const [seedlingUnitPrice, setSeedlingUnitPrice] = useState(0.20);
+  const [seedlingPrice, setSeedlingPrice] = useState(200);
 
   // Calculated Mudas values
   const [totalSeedlings, setTotalSeedlings] = useState(0);
@@ -210,7 +210,7 @@ export function Home () {
     setTotalSeedlings(totalSeedlingsCalc);
 
     // Calcula o custo total das mudas
-    const totalCost = totalSeedlingsCalc * seedlingUnitPrice;
+    const totalCost = totalSeedlingsCalc * (seedlingPrice / 1000);
     setTotalSeedlingsCost(totalCost);
     
     
@@ -232,7 +232,7 @@ export function Home () {
   }, [plants, area, rowSpacing, plantSpacing, calculationType,
     firstCycleProduction, secondCycleProduction, thirdCycleProduction,
     firstCycleStart, firstCycleDuration, secondCycleDuration, thirdCycleDuration,
-    reservePercentage, seedlingUnitPrice,
+    reservePercentage, seedlingPrice,
     totalCycleDays, calculatedArea,    
     soilAnalysisCost,
     wholesalePrice, retailPrice, wholesalePercentage,
@@ -524,6 +524,59 @@ export function Home () {
         </CardContent>
       </Card>
 
+
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Vendas</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="wholesale">Atacado (R$/kg)</Label>
+              <Input
+                id="wholesale"
+                type="number"
+                step="0.01"
+                min="0"
+                value={wholesalePrice}
+                onChange={(e) => setWholesalePrice(Number(e.target.value))}
+              />
+              <p className="mt-2 text-lg font-medium">{wholesalePercentage}%</p>
+            </div>
+            <div>
+              <Label htmlFor="retail">Varejo (R$/kg)</Label>
+              <Input
+                id="retail"
+                type="number"
+                step="0.01"
+                min="0"
+                value={retailPrice}
+                onChange={(e) => setRetailPrice(Number(e.target.value))}
+              />
+              <p className="mt-2 text-lg font-medium">{100 - wholesalePercentage}%</p>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Distribuição de Vendas</Label>
+            <Slider
+              value={[wholesalePercentage]}
+              onValueChange={(values) => setWholesalePercentage(values[0])}
+              max={100}
+              step={1}
+            />
+          </div>
+          <Table>
+            <TableBody>
+              <TableRow className="font-medium">                
+                <TableCell>Preço Médio: R$ {perKgRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / kg</TableCell>
+                <TableCell>Receita Total: R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
       
       <Card className="w-full max-w-2xl">
         <CardHeader>
@@ -605,14 +658,14 @@ export function Home () {
                 <TableCell>{totalSeedlings.toLocaleString('pt-BR')}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Valor unitário (R$)</TableCell>
+                <TableCell>Valor do milheiro (R$)</TableCell>
                 <TableCell className="space-y-2">                  
                   <Input
                     type="number"
                     min="0"
                     step="0.01"
-                    value={seedlingUnitPrice}
-                    onChange={(e) => setSeedlingUnitPrice(Number(e.target.value))}
+                    value={seedlingPrice}
+                    onChange={(e) => setSeedlingPrice(Number(e.target.value))}
                   />
                 </TableCell>
                 {/* <TableCell>R$ {seedlingUnitPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell> */}
@@ -642,59 +695,6 @@ export function Home () {
         totalProductivity={totalProductivity}
         onLaborCostChange={(labor) => setLaborCosts(labor)}
       />
-
-
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Vendas</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <Label htmlFor="wholesale">Atacado (R$/kg)</Label>
-              <Input
-                id="wholesale"
-                type="number"
-                step="0.01"
-                min="0"
-                value={wholesalePrice}
-                onChange={(e) => setWholesalePrice(Number(e.target.value))}
-              />
-              <p className="mt-2 text-lg font-medium">{wholesalePercentage}%</p>
-            </div>
-            <div>
-              <Label htmlFor="retail">Varejo (R$/kg)</Label>
-              <Input
-                id="retail"
-                type="number"
-                step="0.01"
-                min="0"
-                value={retailPrice}
-                onChange={(e) => setRetailPrice(Number(e.target.value))}
-              />
-              <p className="mt-2 text-lg font-medium">{100 - wholesalePercentage}%</p>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Distribuição de Vendas</Label>
-            <Slider
-              value={[wholesalePercentage]}
-              onValueChange={(values) => setWholesalePercentage(values[0])}
-              max={100}
-              step={1}
-            />
-          </div>
-          <Table>
-            <TableBody>
-              <TableRow className="font-medium">                
-                <TableCell>Preço Médio: R$ {perKgRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / kg</TableCell>
-                <TableCell>Receita Total: R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
       
 
       <Card className="w-full max-w-2xl">
@@ -884,11 +884,6 @@ export function Home () {
                 <TableCell colSpan={3} className="font-medium">Serviços</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="pl-8">Irrigação</TableCell>
-                <TableCell className="text-right">{formatCurrency(irrigationCosts)}</TableCell>
-                <TableCell className="text-right">{formatPercentage(calculatePercentage(irrigationCosts, totalRevenue))}</TableCell>
-              </TableRow>
-              <TableRow>
                 <TableCell className="pl-8">Análise de solo</TableCell>
                 <TableCell className="text-right">{formatCurrency(soilAnalysisCost)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(soilAnalysisCost, totalRevenue))}</TableCell>
@@ -897,6 +892,11 @@ export function Home () {
                 <TableCell className="pl-8">Preparação de solo</TableCell>
                 <TableCell className="text-right">{formatCurrency(soilPreparationCost)}</TableCell>
                 <TableCell className="text-right">{formatPercentage(calculatePercentage(soilPreparationCost, totalRevenue))}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="pl-8">Irrigação</TableCell>
+                <TableCell className="text-right">{formatCurrency(irrigationCosts)}</TableCell>
+                <TableCell className="text-right">{formatPercentage(calculatePercentage(irrigationCosts, totalRevenue))}</TableCell>
               </TableRow>
               <TableRow className="font-medium">
                 <TableCell>Total Serviços</TableCell>
