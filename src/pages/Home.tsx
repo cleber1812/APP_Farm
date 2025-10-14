@@ -287,6 +287,9 @@ export function Home () {
   
   // Calcular custo médio
   const averageCost = totalCosts / totalProductivity;
+
+  // Calcular o Ponto de equilíbrio
+  const balanceQuantity = totalCosts / perKgRevenue;
   
   // Calcular percentual de custo sobre faturamento
   const costPercentage = calculatePercentage(totalCosts , totalRevenue);
@@ -1078,7 +1081,26 @@ export function Home () {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <p className="text-lg font-semibold">{formatCurrency(averageCost)} /kg</p>
+              <p className="text-lg font-semibold">{formatCurrency(averageCost)} kg</p>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-4 border-t">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">Ponto de nivelamento</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Ponto de equilíbrio em quantidade</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <p className="text-lg font-semibold">{balanceQuantity.toFixed(0)} kg</p>
             </div>
           </div>
 
